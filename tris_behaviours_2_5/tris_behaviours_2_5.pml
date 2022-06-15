@@ -4,9 +4,17 @@
     <BehaviorDescriptions>
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="prova" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/led_won" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/led_lost" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/sound_lost" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/sound_win" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
-    <Resources />
+    <Resources>
+        <File name="mixkit-retro-game-notification-212" src="daniele/resources/mixkit-retro-game-notification-212.wav" />
+        <File name="pepper_lost" src="daniele/resources/pepper_lost.wav" />
+        <File name="pepper_win" src="daniele/resources/pepper_win.wav" />
+    </Resources>
     <Topics />
     <IgnoredPaths />
     <Translations auto-fill="en_US">
