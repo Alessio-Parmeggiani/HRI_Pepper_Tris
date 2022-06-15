@@ -4,6 +4,9 @@
     <BehaviorDescriptions>
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="prova" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/welcome" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/thinking" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/goodbye" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources />

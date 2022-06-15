@@ -1,7 +1,7 @@
 # Gesture 
-- [ ] (F) welcome/goodbye
+- [X] (F) welcome/goodbye
 
-- [ ] profiling / difficulty select
+- [ ] profiling / difficulty select ? 
 
 - [ ] (F) handshake (lower stiffness to let user shake, maybe?)
 
@@ -20,7 +20,7 @@
 
 # Logic
 
-- [ ] basic proxemics w/ sonar A
+- [ ] (D) basic proxemics w/ sonar A
 - [ ] profiling / difficulty select
 - [ ] Start --> Play --> new match/stop
 
@@ -34,8 +34,8 @@
 
 # Led
 
-- [ ] won
-- [ ] lost
+- [ ] (D) won
+- [ ] (D) lost
 - [ ] (A) thinking (circular animation for eyes?) 
 - [ ] (A) waiting 
 - [ ] red if losing
@@ -44,11 +44,11 @@
 
 # Sound
 
-- [ ] suono fine mossa 
-- [ ] suono vittoria 
-- [ ] suono sconfitta 
+- [ ] (D) suono fine mossa 
+- [ ] (D) suono vittoria 
+- [ ] (D) suono sconfitta 
 - [ ] suono pensare 
-- [ ] suono selezione su tablet 
+- [ ] (D) suono selezione su tablet 
 
 
 # Speech
