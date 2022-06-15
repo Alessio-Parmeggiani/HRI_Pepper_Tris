@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <package uuid="tris-behaviours-25" version="0.0.0">
  <names>
-  <name lang="en_US">Untitled</name>
+  <name lang="en_US">Tris Behaviors 2.5</name>
  </names>
  <supportedLanguages>
   <language>en_US</language>
@@ -38,7 +38,25 @@
    <autonomous/>
    <permissions/>
   </behaviorContent>
+  <behaviorContent path="francesco/welcome">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/thinking">
+   <nature>interactive</nature>
+   <triggerSentences/>
+   <loadingResponses/>
+   <autonomous/>
+   <permissions/>
+  </behaviorContent>
   <behaviorContent path="Alessio/victory">
+   <nature>interactive</nature>
+   <triggerSentences/>
+   <loadingResponses/>
+   <autonomous/>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/goodbye">
    <nature>interactive</nature>
    <triggerSentences/>
    <loadingResponses/>
