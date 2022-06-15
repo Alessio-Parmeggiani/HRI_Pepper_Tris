@@ -19,23 +19,26 @@
   </behaviorContent>
   <behaviorContent path="daniele/led_lost">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/sound_lost">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/sound_win">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/victory">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/point_tablet">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/defeat">
+   <nature></nature>
    <permissions/>
   </behaviorContent>
  </contents>

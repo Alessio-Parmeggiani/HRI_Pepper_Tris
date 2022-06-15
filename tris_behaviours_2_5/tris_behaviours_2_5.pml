@@ -8,12 +8,16 @@
         <BehaviorDescription name="behavior" src="daniele/led_lost" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/sound_lost" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/sound_win" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="Alessio/defeat" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="Alessio/point_tablet" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="Alessio/victory" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>
         <File name="mixkit-retro-game-notification-212" src="daniele/resources/mixkit-retro-game-notification-212.wav" />
         <File name="pepper_lost" src="daniele/resources/pepper_lost.wav" />
         <File name="pepper_win" src="daniele/resources/pepper_win.wav" />
+        <File name="elephant" src="Alessio/victory/elephant.ogg" />
     </Resources>
     <Topics />
     <IgnoredPaths />
