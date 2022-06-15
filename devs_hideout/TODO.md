@@ -12,7 +12,7 @@
 - [ ] announce move (many variants):
     - [ ] (A) point at tablet
     - [ ] air writing
-    - [ ] generic animation(s)
+    - [ ] (D+) generic animation(s)
 
 - [X] thinking
 
