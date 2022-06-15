@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<package uuid="tris-behaviours-25" version="0.0.0">
+<package version="0.0.0" uuid="tris-behaviours-25">
  <names>
-  <name lang="en_US">Tris Behaviors 2.5</name>
+  <name lang="en_US">Untitled</name>
  </names>
  <supportedLanguages>
   <language>en_US</language>
@@ -19,38 +19,17 @@
   </behaviorContent>
   <behaviorContent path="daniele/led_lost">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/sound_lost">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/sound_win">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
-   <permissions/>
-  </behaviorContent>
-  <behaviorContent path="francesco/welcome">
-   <nature>interactive</nature>
-   <permissions/>
-  </behaviorContent>
-  <behaviorContent path="francesco/thinking">
-   <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="Alessio/victory">
-   <nature>interactive</nature>
-   <permissions/>
-  </behaviorContent>
-  <behaviorContent path="francesco/goodbye">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
@@ -59,14 +38,7 @@
    <permissions/>
   </behaviorContent>
   <behaviorContent path="Alessio/defeat">
-   <nature>interactive</nature>
-   <permissions/>
-  </behaviorContent>
-  <behaviorContent path="francesco/goodbye2">
-   <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
+   <nature></nature>
    <permissions/>
   </behaviorContent>
  </contents>

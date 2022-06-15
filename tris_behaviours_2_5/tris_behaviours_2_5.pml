@@ -4,6 +4,10 @@
     <BehaviorDescriptions>
         <BehaviorDescription name="behavior" src="behavior_1" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="prova" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/led_won" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/led_lost" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/sound_lost" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/sound_win" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/welcome" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/thinking" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/goodbye" xar="behavior.xar" />
@@ -14,6 +18,8 @@
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>
+        <File name="pepper_lost" src="daniele/resources/pepper_lost.wav" />
+        <File name="pepper_win" src="daniele/resources/pepper_win.wav" />
         <File name="elephant" src="Alessio/victory/elephant.ogg" />
     </Resources>
     <Topics />
