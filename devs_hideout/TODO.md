@@ -13,6 +13,7 @@
     - [ ] (A) point at tablet
     - [ ] air writing
     - [ ] (D+) generic animation(s)
+        - [X] (D) invite user to make his move (on touch of tablet it cancel)
 
 - [X] thinking
 
@@ -34,8 +35,8 @@
 
 # Led
 
-- [ ] (D) won
-- [ ] (D) lost
+- [X] (D) won
+- [X] (D) lost
 - [ ] (A) thinking (circular animation for eyes?) 
 - [ ] (A) waiting 
 - [ ] red if losing
@@ -45,8 +46,8 @@
 # Sound
 
 - [ ] (D) suono fine mossa 
-- [ ] (D) suono vittoria 
-- [ ] (D) suono sconfitta 
+- [X] (D) suono vittoria 
+- [X] (D) suono sconfitta 
 - [ ] suono pensare 
 - [ ] (D) suono selezione su tablet 
 

@@ -60,5 +60,9 @@
    <autonomous/>
    <permissions/>
   </behaviorContent>
+  <behaviorContent path="daniele/gesture_turn_1">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
  </contents>
 </package>
