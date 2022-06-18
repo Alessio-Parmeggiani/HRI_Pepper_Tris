@@ -3,7 +3,7 @@
 
 - [ ] profiling / difficulty select ? 
 
-- [ ] (F) handshake (lower stiffness to let user shake, maybe?)
+- [X] (F) handshake (lower stiffness to let user shake, maybe?)
 
 - [ ] (A) victory animation
 
@@ -11,7 +11,7 @@
 
 - [ ] announce move (many variants):
     - [ ] (A) point at tablet
-    - [ ] air writing
+    - [X] (F) air writing *(Not sure it's a good idea. Tried writing on an horizontal plane and out of the user's way, but found no way to make it elegant.)*
     - [ ] (D+) generic animation(s)
         - [X] (D) invite user to make his move (on touch of tablet it cancel)
 

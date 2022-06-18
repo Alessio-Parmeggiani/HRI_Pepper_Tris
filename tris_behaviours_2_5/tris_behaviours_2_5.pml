@@ -16,6 +16,9 @@
         <BehaviorDescription name="behavior" src="Alessio/victory" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/goodbye2" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/gesture_turn_1" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/offer_handshake" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/write_o" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/write_x" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

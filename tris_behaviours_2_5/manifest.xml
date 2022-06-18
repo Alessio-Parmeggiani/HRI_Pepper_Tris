@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<package version="0.0.0" uuid="tris-behaviours-25">
+<package uuid="tris-behaviours-25" version="0.0.0">
  <names>
   <name lang="en_US">Tris Behaviors 2.5</name>
  </names>
@@ -12,9 +12,6 @@
  <contents>
   <behaviorContent path="daniele/led_won">
    <nature>solitary</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/led_lost">
@@ -55,12 +52,21 @@
   </behaviorContent>
   <behaviorContent path="francesco/goodbye2">
    <nature>interactive</nature>
-   <triggerSentences/>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
   <behaviorContent path="daniele/gesture_turn_1">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/offer_handshake">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/write_o">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/write_x">
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
