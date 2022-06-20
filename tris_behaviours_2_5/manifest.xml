@@ -70,5 +70,9 @@
    <nature>interactive</nature>
    <permissions/>
   </behaviorContent>
+  <behaviorContent path="daniele/gesture_turn_2">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
  </contents>
 </package>

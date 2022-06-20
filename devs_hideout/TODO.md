@@ -13,7 +13,8 @@
     - [ ] (A) point at tablet
     - [X] (F) air writing *(Not sure it's a good idea. Tried writing on an horizontal plane and out of the user's way, but found no way to make it elegant.)*
     - [ ] (D+) generic animation(s)
-        - [X] (D) invite user to make his move (on touch of tablet it cancel)
+        - [X] (D) invite user to make his move (on touch of tablet it cancel) (gesture_turn_1)
+        - [X] (D) wait gesture, "it's not your turn" (hand in front) (gesture_turn_2)
 
 - [X] thinking
 
