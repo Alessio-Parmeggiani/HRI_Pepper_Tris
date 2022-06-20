@@ -1,0 +1,61 @@
+:root {
+    --board-line-width: 5px;
+
+    /* tile = board*30/100 */
+    /* default set for these three: 300px 90px 50px */
+    /* larger set: 600px 180px 100px */
+    --board-dim: 600px;
+    --tile-dim: 180px;
+    --font-size: 150px;   /* x1.5 if using the cool Unicode characters ⨯○ */
+
+    --x-color: red;
+    --o-color: blue;
+}
+
+.container {
+    margin: /*0*/ auto;
+    display: grid;
+    grid-template-columns:  10% 30% 30% 30%;
+    grid-template-rows: 10% 30% 30% 30%;
+    max-width: var(--board-dim);
+    max-height: var(--board-dim);
+}
+
+.coord {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tile {
+    /* border: 1px solid black; */
+    min-width: var(--tile-dim);
+    min-height: var(--tile-dim);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--font-size);
+}
+
+.tile#t00, .tile#t01, .tile#t10, .tile#t11 {
+    border-bottom: var(--board-line-width) solid black;
+    border-right: var(--board-line-width) solid black;
+}
+
+.tile#t02, .tile#t12 {
+    border-bottom: var(--board-line-width) solid black;
+}
+
+.tile#t20, .tile#t21 {
+    border-right: var(--board-line-width) solid black;
+}
+
+/* t22 has no border */
+
+.has-x {
+    color: var(--x-color);
+}
+
+.has-o {
+    color: var(--o-color);
+}
