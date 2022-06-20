@@ -29,7 +29,7 @@
 
 # UI
 
-- [ ] game board
+- [X] (F) game board
 - [ ] profiling / difficulty select (select on tablet for extra multimodality)
 - [ ] grid coordinates
 
