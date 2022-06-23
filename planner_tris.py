@@ -1,6 +1,8 @@
-# use a game tree to play tris optimally
+# use a game tree to play tris optimally (or not!)
 
 from tris import *
+
+import random
 
 class GameTree:
     def __init__(self, board, player):
@@ -45,9 +47,9 @@ class GameTree:
         goaw = get_game_over_and_winner(self.board)
         if goaw[0] == True: 
             if goaw[1] == Tris.X:
-                self.score = 1/self.depth    # value early wins higher
+                self.score = 1.0/self.depth    # value early wins higher
             elif goaw[1] == Tris.O:
-                self.score = -1/self.depth   # value early wins higher
+                self.score = -1.0/self.depth   # value early wins higher
             else:
                 self.score = 0
             return
@@ -103,4 +105,22 @@ class GameTree:
             #O player minimizes
             return self.get_min_move()
 
+    def get_worst_move(self):
+        #X player would maximize, but...
+        if self.player == Tris.X:
+            return self.get_min_move()
+        else:
+            #O player would minimize, but...
+            return self.get_max_move()
+    
+    # select a random move from the available ones (i.e. children)
+    def get_random_move(self):
+        return random.choice(self.children).move, 0
 
+    def get_optimal_or_random_move(self, epsilon):
+        if random.random() < epsilon:
+            print "doing random move"
+            return self.get_random_move()
+        else:
+            print "doing optimal move"
+            return self.get_optimal_move()

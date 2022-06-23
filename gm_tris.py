@@ -34,8 +34,11 @@ class GameManager:
             self.agent.on_opponent_move(player_move)
 
             print self.game
-    
+
+        print "^_^"
+        print ""
         print "WINNER IS:  " + str(self.game.get_game_over_and_winner()[1])
+        print ""
             
             
 if __name__ == "__main__":

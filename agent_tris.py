@@ -11,7 +11,7 @@ class Agent:
 
     def on_my_turn(self):
         # get the best move from the tree
-        move = self.tree.get_optimal_move()[0]
+        move = self.tree.get_optimal_or_random_move(0.5)[0]
         # maintain only the tree with the chosen move
         self.tree = self.tree.get_child_by_move(move)
         return move
