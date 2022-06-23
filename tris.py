@@ -59,6 +59,14 @@ class Tris:
                 s += ' ' + ('X' if cell == Tris.X else 'O' if cell == Tris.O else ' ')
             s += '\n'
         return s
+    
+    def get_board_for_tablet(self):
+        s = ''
+        for row in self.board:
+            for cell in row:
+                s += ('X' if cell == Tris.X else 'O' if cell == Tris.O else '.')
+        return s
+
 
 
 

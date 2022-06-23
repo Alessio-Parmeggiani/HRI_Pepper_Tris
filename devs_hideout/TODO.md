@@ -5,43 +5,54 @@
 
 - [X] (F) handshake (lower stiffness to let user shake, maybe?)
 
-- [ ] (A) victory animation
+- [X] (A) victory animation
 
-- [ ] (A) defeat animation
+- [X] (A) defeat animation
 
 - [ ] announce move (many variants):
-    - [ ] (A) point at tablet
+    - [X] (A) point at tablet
     - [X] (F) air writing *(Not sure it's a good idea. Tried writing on an horizontal plane and out of the user's way, but found no way to make it elegant.)*
     - [ ] (D+) generic animation(s)
-        - [X] (D) invite user to make his move (on touch of tablet it cancel) (gesture_turn_1)
         - [X] (D) wait gesture, "it's not your turn" (hand in front) (gesture_turn_2)
+        - [ ] "you cannot do this move" gesture
+
+
+- [ ] waiting on the other player (impatience gestures):
+    - [X] (D) "your turn" :invite user to make his move (gesture_turn_1)
+    - [ ] "come on" gesture
+    - [ ] "i'm sleeping" gesture
+    - [ ] "uff..." gesture
 
 - [X] thinking
 
 
 
-# Logic
+# Logic/Reasoning
 
 - [ ] (D) basic proxemics w/ sonar A
 - [ ] profiling / difficulty select
 - [ ] Start --> Play --> new match/stop
+- [ ] Qualcosa di migliore per la scelta della mossa (qualche paper utile da trovare)
 
 
 # UI
 
 - [X] (F) game board
 - [ ] profiling / difficulty select (select on tablet for extra multimodality)
-- [ ] grid coordinates
+- [X] grid coordinates
+- [ ] select move by touching/clicking grid cell
+- [ ] highlight tiles in a tris
+
 
 
 # Led
 
 - [X] (D) won
 - [X] (D) lost
-- [ ] (A) thinking (circular animation for eyes?) 
-- [ ] (A) waiting 
-- [ ] red if losing
-- [ ] green if winning
+- [X] (A) thinking (circular animation for eyes?) 
+- [X] (A) waiting 
+- [X] red if losing
+- [X] green if winning
 
 
 # Sound

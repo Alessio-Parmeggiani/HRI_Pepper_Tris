@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package uuid="tris-behaviours-25" version="0.0.0">
+ <names>
+  <name lang="en_US">Tris Behaviors 2.5</name>
+ </names>
+ <supportedLanguages>
+  <language>en_US</language>
+ </supportedLanguages>
+ <descriptionLanguages>
+  <language>en_US</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="daniele/led_won">
+   <nature>solitary</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="daniele/led_lost">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="daniele/sound_lost">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="daniele/sound_win">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/welcome">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/thinking">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/victory">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/goodbye">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/point_tablet">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="Alessio/defeat">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/goodbye2">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="daniele/gesture_turn_1">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/offer_handshake">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/write_o">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/write_x">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="daniele/gesture_turn_2">
+   <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

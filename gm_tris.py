@@ -1,3 +1,5 @@
+# This is ONLY for test games via command line
+
 from tris import *
 from planner_tris import *
 from agent_tris import *
