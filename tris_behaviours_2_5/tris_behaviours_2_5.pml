@@ -20,12 +20,17 @@
         <BehaviorDescription name="behavior" src="francesco/write_o" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/write_x" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/gesture_turn_2" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/sleeping_gesture" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="daniele/shake_head_gesture" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>
         <File name="pepper_lost" src="daniele/resources/pepper_lost.wav" />
         <File name="pepper_win" src="daniele/resources/pepper_win.wav" />
         <File name="elephant" src="Alessio/victory/elephant.ogg" />
+        <File name="device-power-down-sound-effect" src="daniele/resources/device-power-down-sound-effect.wav" />
+        <File name="device-power-up-sound-effect" src="daniele/resources/device-power-up-sound-effect.wav" />
+        <File name="device-power-up-sound-effect_short" src="daniele/resources/device-power-up-sound-effect_short.wav" />
     </Resources>
     <Topics />
     <IgnoredPaths />
