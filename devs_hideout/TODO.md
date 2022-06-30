@@ -14,13 +14,13 @@
     - [X] (F) air writing *(Not sure it's a good idea. Tried writing on an horizontal plane and out of the user's way, but found no way to make it elegant.)*
     - [ ] (D+) generic animation(s)
         - [X] (D) wait gesture, "it's not your turn" (hand in front) (gesture_turn_2)
-        - [ ] "you cannot do this move" gesture
+        - [X] "you cannot do this move" gesture (shake head gesture)
 
 
 - [ ] waiting on the other player (impatience gestures):
     - [X] (D) "your turn" :invite user to make his move (gesture_turn_1)
     - [ ] "come on" gesture
-    - [ ] "i'm sleeping" gesture
+    - [X] "i'm sleeping" gesture
     - [ ] "uff..." gesture
 
 - [X] thinking
@@ -29,7 +29,7 @@
 
 # Logic/Reasoning
 
-- [ ] (D) basic proxemics w/ sonar A
+- [X] (D) basic proxemics w/ sonar A
 - [ ] profiling / difficulty select
 - [ ] Start --> Play --> new match/stop
 - [ ] Qualcosa di migliore per la scelta della mossa (qualche paper utile da trovare)
