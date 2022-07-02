@@ -124,3 +124,45 @@ class GameTree:
         else:
             print "doing optimal move"
             return self.get_optimal_move()
+
+    ##### Francesco's experimentation. Further test (by everyone) pending.
+    # mercifulness score is: (max_depth/9) - !opponent_can_win     (guaranteed to be in [-1,1])
+    # i.e. stall the game, but leave a way for the human to win
+    # returns: (move, score, depth, opponent_can_win)
+    def get_merciful_move(self):
+        if len(self.children) == 0:
+            opponent_won = self.score>0 if this.player==Tris.O else self.score<0
+            mercy_score = (self.depth/9.0) - (1 if not opponent_won else 0)
+            return None, mercy_score, self.depth, opponent_won
+        best_child = None
+        best_score = -1
+        best_depth = None
+        best_opp_can_win = None
+        for child in self.children:
+            move, minmax_score = child.get_optimal_move()   # assume the opponent is playing to win AND they expect Pepper to also be playing to win
+            # fortunately the minmax score allows us to derive all info we need by construction
+            if minmax_score == 0:
+                mercy_depth = 9   # necessarily, a draw can only happen on a full board
+            else:
+                mercy_depth = round(1.0/abs(minmax_score))
+            opponent_won = minmax_score>0 if child.player==Tris.X else minmax_score<0
+            # the above is a worst-case estimate of opponent_can_win:
+            # if the opponent can win under optimal Pepper plays, then there is certainly a way to win,
+            # albeit it is possible that the opponent didn't win under optimal Pepper plays but could if Pepper was merciful some other time
+
+            mercy_score = (mercy_depth/9.0) - (1 if not opponent_won else 0)
+            if mercy_score >= best_score:
+                best_child = child
+                best_score = mercy_score
+                best_depth = mercy_depth
+                best_opp_can_win = opponent_won
+        
+        return best_child.move, best_score, best_depth, best_opp_can_win
+    
+    def get_optimal_or_merciful_move(self, epsilon):
+        if random.random() < epsilon:
+            print "doing merciful move"
+            return self.get_merciful_move()
+        else:
+            print "doing optimal move"
+            return self.get_optimal_move()
