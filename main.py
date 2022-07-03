@@ -1,5 +1,6 @@
 import os, sys
 import math
+import time
 
 sys.path.append(os.getenv('PEPPER_TOOLS_HOME')+'/cmd_server')
 
@@ -13,6 +14,9 @@ from agent_tris import *
 
 import threading
 from webserver import go
+
+vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
+game = None    # Blackboard needs this global, and Pepper can only play one game at a time regardless
 
 # classes for the webserver
 
@@ -63,58 +67,18 @@ def parse_move(response):
     
     return player_move
 
-begin()
-
-the_bb = Blackboard()
-
-the_webserver_thread = WebServerThread(the_bb)
-the_webserver_thread.start()
-
-#wait for connection
-while not the_bb.the_handler:
-    pass
-
-ws_handler = the_bb.the_handler
-
-pepper_cmd.robot.say('Hello')
-pepper_cmd.robot.say('Wanna play tris?')
-
-#establishing test vocabulary
-vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
-response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
 
-print "FORCING YES"   # DEBUG ONLY; TODO remove
-response = "yes!!!"
+# Im which Pepper plays ONE game
+# returns the winner: Tris.X, Tris.O, Tris.DRAW
+def play_game(difficulty_bias, pepper_player):
 
-if "yes" in response:
-    # TODO
-    welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome")
-    pepper_cmd.robot.say('yeah')
-    welcome.wait()
-    
-    #SET PARAMETERS FOR PLAY
-    pepper_player = Tris.X
-    human_player = Tris.O
-
-    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
-    pepper_cmd.robot.say("Please select a difficulty level on my tablet")
-    while not the_bb.user_age or not the_bb.user_experience: 
-        #wait for difficulty input 
-        pass
+    global game
 
     print "initializing game...."
     pepper_cmd.robot.say("Please wait while I load the game...")
+    #TODO placeholder for loading
     game = Tris()
-
-    #PROFILING
-
-    user_age=the_bb.user_age
-    user_experience=the_bb.user_experience
-    #combine user age and user experience like in f1 score
-
-    difficulty_bias=1-(2*(user_age * user_experience)/(user_age + user_experience))
-    print "difficulty is: ", difficulty_bias
     agent = Agent(game, pepper_player, difficulty_bias)
     
     #START MATCH
@@ -194,30 +158,110 @@ if "yes" in response:
 
     
     #END MATCH
-        # TODO gesture fine/vittoria/sconfitta
-    print "^_^"
-    print ""
-    print "WINNER IS:  " + str(game.get_game_over_and_winner()[1])
-    print ""
+    return game.get_game_over_and_winner()[1]
 
-    if game.get_game_over_and_winner()[1] == pepper_player:
-        win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
-        pepper_cmd.robot.say('I win')
-        win.wait()
-    else:
-        lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
-        pepper_cmd.robot.say('Oh no')
-        lose.wait()
+### end play_game()
 
 
+# This includes all the interaction with a new user
+def interact():
+
+    pepper_cmd.robot.say('Hello')
+    pepper_cmd.robot.say('Wanna play tris?')
+    response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
 
-else:   # answered NO to "wanna play tris?"
-    goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
-    pepper_cmd.robot.say('Oh, okay. Goodbye.')
-    goodbye.wait()
-
-
+    print "FORCING YES"   # DEBUG ONLY; TODO remove
+    response = "yes!!!"
     
+    if "yes" in response:
+        # TODO
+        welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome")
+        pepper_cmd.robot.say('yeah')
+        welcome.wait()
+        
+        #SET PARAMETERS FOR PLAY
+        pepper_player = Tris.X
+        human_player = Tris.O
+
+        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+        pepper_cmd.robot.say("Please select a difficulty level on my tablet")
+        while not the_bb.user_age or not the_bb.user_experience: 
+            #wait for difficulty input 
+            pass
+
+
+        #PROFILING
+        user_age=the_bb.user_age
+        user_experience=the_bb.user_experience
+        #combine user age and user experience like in f1 score
+        difficulty_bias=1-(2*(user_age * user_experience)/(user_age + user_experience))
+        print "initial difficulty is: ", difficulty_bias
+
+        play_again = True
+        
+        while play_again:
+            #initialize board and play
+            winner = play_game(difficulty_bias, pepper_player)
+
+            print "^_^"
+            print ""
+            print "WINNER IS:  " + str(winner)
+            print ""
+
+            if winner == pepper_player:
+                win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
+                pepper_cmd.robot.say('I win')
+                # TODO update difficulty somehow
+                win.wait()
+            else:
+                lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
+                pepper_cmd.robot.say('Oh no')
+                # TODO update difficulty somehow
+                lose.wait()
+            
+            pepper_cmd.robot.say('Wanna play again?')
+            response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
+            play_again = "yes" in response
+        ### end while
+
+        # get here when user wants to stop playing
+        # TODO Pepper ci dice il punteggio finale?
+        goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
+        pepper_cmd.robot.say('Oh, okay. Goodbye.')
+        goodbye.wait()
+
+
+    else:   # answered NO to "wanna play tris?"
+        goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
+        pepper_cmd.robot.say('Oh, okay. Goodbye.')
+        goodbye.wait()
+
+### end interact()
+
+
+
+
+begin()
+
+the_bb = Blackboard()
+
+the_webserver_thread = WebServerThread(the_bb)
+the_webserver_thread.start()
+
+#wait for connection
+while not the_bb.the_handler:
+    pass
+
+ws_handler = the_bb.the_handler
+
+while True:
+
+    # TODO wait for sonar
+
+    interact()
+
+    time.sleep(2)
+
 
 end()
