@@ -68,8 +68,63 @@ def parse_move(response):
     return player_move
 
 
+def pepper_turn(agent):
+    pepper_move = agent.on_my_turn()
+    game.move(*pepper_move)
 
-# Im which Pepper plays ONE game
+    #TODO thinking led
+    #TODO gesture
+
+### end pepper_turn()
+
+def player_turn(agent):
+    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+    pepper_cmd.robot.say('Your move :)')
+    #point_tablet.wait()     
+    #human move
+    #recognize move speech
+    vocabulary_player_move = ["A 1", "A 2", "A 3", "B 1", "B 2", "B 3", "C 1", "C 2", "C 3",
+                              "1 A", "2 A", "3 A", "1 B", "2 B", "3 B", "1 C", "2 C", "3 C",]
+    response = ""  # the default response from pepper_cmd's ASR
+    impatience_score = 0
+    pepper_responses = ["your turn", "come on", "i'm sleeping", "uff..."]
+    player_move = None
+    #TODO led waiting
+    while True:
+        timeout = 7 + 6*random.random()
+        response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
+
+        # don't do anything else if the move was done via click
+        if the_bb.clicked_move:
+            player_move = the_bb.clicked_move
+            the_bb.clicked_move = None
+            break
+
+        if response:
+            player_move = parse_move(response)
+            valid = game.move(*player_move)
+            if valid:
+                break
+            else: # invalid move
+                # TODO invalid move gest
+                pepper_cmd.robot.say("You can't play there!")
+                print "invalid move"
+        else: # ASR timed out
+            gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
+            pepper_cmd.robot.say(pepper_responses[impatience_score])
+
+            if impatience_score+1 < len(pepper_responses):
+                impatience_score += 1
+        
+    agent.on_opponent_move(player_move)
+
+    #TODO feedback
+    pepper_cmd.robot.say('Good move :)')
+
+### end player_turn()
+
+
+# In which Pepper plays ONE game
 # returns the winner: Tris.X, Tris.O, Tris.DRAW
 def play_game(difficulty_bias, pepper_player):
 
@@ -84,75 +139,18 @@ def play_game(difficulty_bias, pepper_player):
     #START MATCH
     while not game.get_game_over_and_winner()[0]:
 
-        #PEPPER TURN
-        pepper_move=agent.on_my_turn()
-        game.move(*pepper_move)
-
+        if game.get_current_player() == pepper_player:
+            pepper_turn(agent)
+        else:
+            player_turn(agent)
+        
         # update tablet
         web_board=game.get_board_for_tablet()
         ws_handler.send(web_board)
-        
-        #TODO thinking led
-        #TODO gesture 
-
-        print game
-        
-        #check victory
-        if game.get_game_over_and_winner()[0]:
-            break
-
-
-        #PLAYER TURN 
-        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
-        pepper_cmd.robot.say('Your move :)')
-        #point_tablet.wait()     
-        #human move
-        #recognize move speech
-        vocabulary_player_move = ["A 1", "A 2", "A 3", "B 1", "B 2", "B 3", "C 1", "C 2", "C 3",
-                                  "1 A", "2 A", "3 A", "1 B", "2 B", "3 B", "1 C", "2 C", "3 C",]
-        response=""  # the default response from pepper_cmd's ASR
-        impatience_score = 0
-        pepper_responses=["your turn", "come on", "i'm sleeping", "uff..."]
-        player_move=None
-        #TODO led waiting
-        while True:
-            timeout = 7 + 6*random.random()
-            response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
-
-            # don't do anything else if the move was done via click
-            if the_bb.clicked_move:
-                player_move = the_bb.clicked_move
-                the_bb.clicked_move = None
-                break
-
-            if response:
-                player_move = parse_move(response)
-                valid = game.move(*player_move)
-                if valid:
-                    break
-                else: # invalid move
-                    # TODO invalid move gest
-                    pepper_cmd.robot.say("You can't play there!")
-                    print "invalid move"
-            else: # ASR timed out
-                gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
-                pepper_cmd.robot.say(pepper_responses[impatience_score])
-    
-                if impatience_score+1 < len(pepper_responses):
-                    impatience_score += 1
             
-        agent.on_opponent_move(player_move)
-        # update tablet
-        web_board=game.get_board_for_tablet()
-        ws_handler.send(web_board)
-
         print game
-        
-        #TODO feedback
-        pepper_cmd.robot.say('Good move :)')
-        #TODO update tablet
 
-        # redundant, but i'm sure i'd forget if i don't write this
+        #check victory
         if game.get_game_over_and_winner()[0]:
             break
 
