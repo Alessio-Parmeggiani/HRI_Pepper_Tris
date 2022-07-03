@@ -193,8 +193,13 @@ def interact():
         user_age=the_bb.user_age
         user_experience=the_bb.user_experience
         #combine user age and user experience like in f1 score
-        difficulty_bias=1-(2*(user_age * user_experience)/(user_age + user_experience))
+        base_difficulty = 1-(2*(user_age * user_experience)/(user_age + user_experience))
+        difficulty_bias = base_difficulty
         print "initial difficulty is: ", difficulty_bias
+
+        # init score
+        pepper_score = 0
+        human_score = 0
 
         play_again = True
         
@@ -207,20 +212,50 @@ def interact():
             print "WINNER IS:  " + str(winner)
             print ""
 
-            if winner == pepper_player:
+            pepper_won = winner == pepper_player
+    
+            if pepper_won:
+                pepper_score += 1
+                pepper_player = Tris.O
+                human_player = Tris.X
+
                 win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
                 pepper_cmd.robot.say('I win')
-                # TODO update difficulty somehow
                 win.wait()
+
             else:
+                human_score += 1
+                pepper_player = Tris.X
+                human_player = Tris.O
+    
                 lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
                 pepper_cmd.robot.say('Oh no')
-                # TODO update difficulty somehow
                 lose.wait()
+            
+            # TODO handle draw (no player change, no score change (thus no difficulty change), new behaviors)
+
+            print ("score", "pepper", pepper_score, "human", human_score)
+            
+            # adjust difficulty for next game
+            ratio = (pepper_score+2.0)/(human_score+2.0)    # gotta add at least +1 to avoid division by 0, add more to dampen the difficulty swing during the first games
+            if ratio <= 1:    # human is winning, Pepper plays harder
+                difficulty_bias = ratio * base_difficulty
+            if ratio > 1:    # Pepper is winning and plays easier
+                ratio = 1.0/ratio
+                difficulty_bias = base_difficulty + ratio * (1-base_difficulty)
+            print ("difficulty:", difficulty_bias)
             
             pepper_cmd.robot.say('Wanna play again?')
             response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
             play_again = "yes" in response
+
+            if play_again:
+                if pepper_won:
+                    pepper_cmd.robot.say("Alright, I'll go easy on you. Take X.")
+                else:
+                    pepper_cmd.robot.say("I have to try harder... Take CIRCLE.")
+                # TODO handle draw (new sentence to say in here)
+
         ### end while
 
         # get here when user wants to stop playing
