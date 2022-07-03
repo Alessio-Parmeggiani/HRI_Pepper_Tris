@@ -27,6 +27,12 @@ class WebSocketServer(tornado.websocket.WebSocketHandler):
         if tokens[0] == "click":
             the_bb.onclick( (int(tokens[1]), int(tokens[2])) )
         
+        elif tokens[0] == "age":
+            the_bb.user_age = float(tokens[1])
+        
+        elif tokens[0] == "experience":
+            the_bb.user_experience = float(tokens[1])
+        
         else:
             print "Got unknown message"
   

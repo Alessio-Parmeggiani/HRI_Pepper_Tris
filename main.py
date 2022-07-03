@@ -20,6 +20,8 @@ class Blackboard():
     def __init__(self):
         self.the_handler = None
         self.clicked_move = None
+        self.user_experience=None
+        self.user_age=None
     
     def onclick(self, move):
         if not self.clicked_move:
@@ -82,22 +84,38 @@ vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
 response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
 
+print "FORCING YES"   # DEBUG ONLY; TODO remove
+response = "yes!!!"
+
 if "yes" in response:
     # TODO
     welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome")
     pepper_cmd.robot.say('yeah')
     welcome.wait()
     
-    #TODO PROFILING
-
     #SET PARAMETERS FOR PLAY
     pepper_player = Tris.X
     human_player = Tris.O
 
+    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+    pepper_cmd.robot.say("Please select a difficulty level on my tablet")
+    while not the_bb.user_age or not the_bb.user_experience: 
+        #wait for difficulty input 
+        pass
+
     print "initializing game...."
     pepper_cmd.robot.say("Please wait while I load the game...")
     game = Tris()
-    agent = Agent(game, pepper_player)
+
+    #PROFILING
+
+    user_age=the_bb.user_age
+    user_experience=the_bb.user_experience
+    #combine user age and user experience like in f1 score
+
+    difficulty_bias=1-(2*(user_age * user_experience)/(user_age + user_experience))
+    print "difficulty is: ", difficulty_bias
+    agent = Agent(game, pepper_player, difficulty_bias)
     
     #START MATCH
     while not game.get_game_over_and_winner()[0]:

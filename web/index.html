@@ -4,26 +4,52 @@
 		<link rel="stylesheet" href="style.css">
 		<script src="script.js"></script>
 	</head>
-	<body onload="body_loaded()"">
-		<h1>Play with me!</h1>
+	<body onload="body_loaded()">
+		
+		<div id="age-select">
+			<h1>How old are you?</h1>
 
-		<div class="container">
-			<div class="coord"></div>
-			<div class="coord">1</div>
-			<div class="coord">2</div>
-			<div class="coord">3</div>
-			<div class="coord">A</div>
-			<div class="tile" id="t00"></div>
-			<div class="tile" id="t01"></div>
-			<div class="tile" id="t02"></div>
-			<div class="coord">B</div>
-			<div class="tile" id="t10"></div>
-			<div class="tile" id="t11"></div>
-			<div class="tile" id="t12"></div>
-			<div class="coord">C</div>
-			<div class="tile" id="t20"></div>
-			<div class="tile" id="t21"></div>
-			<div class="tile" id="t22"></div>
+			<div class="age-grid">
+				<button class="menu-button" id="baby">0 – 13</button>
+				<button class="menu-button" id="teen">14 – 18</button>
+				<button class="menu-button" id="young">19 – 24</button>
+				<button class="menu-button" id="old">25+</button>
+			</div>
 		</div>
+		
+
+		<div id="experience-select" hidden>
+			<h1>How strong are you at tic-tac-toe?</h1>
+
+			<div class="experience-flex">
+				<button class="menu-button" id="beginner">Beginner</button>
+				<button class="menu-button" id="expert">Expert</button>
+			</div>
+		</div>
+
+
+		<div id="game" hidden>
+			<h1>Play with me!</h1>
+
+			<div class="container">
+				<div class="coord"></div>
+				<div class="coord">1</div>
+				<div class="coord">2</div>
+				<div class="coord">3</div>
+				<div class="coord">A</div>
+				<div class="tile" id="t00"></div>
+				<div class="tile" id="t01"></div>
+				<div class="tile" id="t02"></div>
+				<div class="coord">B</div>
+				<div class="tile" id="t10"></div>
+				<div class="tile" id="t11"></div>
+				<div class="tile" id="t12"></div>
+				<div class="coord">C</div>
+				<div class="tile" id="t20"></div>
+				<div class="tile" id="t21"></div>
+				<div class="tile" id="t22"></div>
+			</div>
+		</div>
+		
 	<body>
 </html>

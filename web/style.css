@@ -12,6 +12,35 @@
     --o-color: blue;
 }
 
+.age-grid {
+    margin: 3%;
+    display: grid;
+    grid-template-columns:  50% 50%;
+    grid-template-rows: 50% 50%;
+}
+
+.experience-flex {
+    margin: 3%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 650px;
+}
+
+.menu-button {
+    margin: 50px;
+    min-width: 500px;
+    height: 340px;
+    font-size: 100px;
+}
+
+
+
+
+
+
+
+
 .container {
     margin: /*0*/ auto;
     display: grid;
