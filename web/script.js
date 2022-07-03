@@ -75,4 +75,20 @@ function body_loaded() {
     console.error(`[WS error] ${error.message}`);
   };
 
+  
+
+
+  function get_tile_click_handler(row, col) {
+    return () => {
+      socket.send("click "+row+" "+col);
+      console.log("click "+row+" "+col);
+    }
+  }
+
+  for (let i=0; i<board_matrix.length; i++) {
+    for (let j=0; j<board_matrix[i].length; j++) {
+      board_matrix[i][j].onclick = get_tile_click_handler(i, j);
+    }
+  }
+
 }

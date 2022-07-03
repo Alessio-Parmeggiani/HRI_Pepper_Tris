@@ -19,6 +19,17 @@ from webserver import go
 class Blackboard():
     def __init__(self):
         self.the_handler = None
+        self.clicked_move = None
+    
+    def onclick(self, move):
+        if not self.clicked_move:
+            valid = game.move(*move)
+            if valid:
+                self.clicked_move = move
+                web_board=game.get_board_for_tablet()
+                ws_handler.send(web_board)
+                # TODO suono e/o lucetta (no motion)
+
 
 class WebServerThread(threading.Thread):
     def __init__(self, bb):
@@ -126,6 +137,12 @@ if "yes" in response:
             timeout = 7 + 6*random.random()
             response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
 
+            # don't do anything else if the move was done via click
+            if the_bb.clicked_move:
+                player_move = the_bb.clicked_move
+                the_bb.clicked_move = None
+                break
+
             if response:
                 player_move = parse_move(response)
                 valid = game.move(*player_move)
@@ -138,7 +155,9 @@ if "yes" in response:
             else: # ASR timed out
                 gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
                 pepper_cmd.robot.say(pepper_responses[impatience_score])
-                impatience_score += 1
+    
+                if impatience_score+1 < len(pepper_responses):
+                    impatience_score += 1
             
         agent.on_opponent_move(player_move)
         # update tablet

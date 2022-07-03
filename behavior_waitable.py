@@ -11,8 +11,14 @@ class BehaviorWaitable:
         self.theBehaviorName = behaviorName
         self.finished = False
         self.listenerID = pepper_cmd.robot.beh_service.behaviorStopped.connect(self.onstop)
-        pepper_cmd.robot.beh_service.startBehavior(self.theBehaviorName)
-        # NON-BLOCKING (which is why I made this simple waitable)
+        try:
+            pepper_cmd.robot.beh_service.startBehavior(self.theBehaviorName)
+            # NON-BLOCKING (which is why I made this simple waitable)
+        except RuntimeError:   # behavior already running
+            self.finished = True
+        except Exception:
+            print "Unknown error in BehaviorWaitable"
+            self.finished = True
     
     def onstop(self, behaviorName):
         if self.theBehaviorName == behaviorName:

@@ -21,8 +21,14 @@ class WebSocketServer(tornado.websocket.WebSocketHandler):
         self.write_message(string)
        
     def on_message(self, message):
-        # We only expect to tell the tablet the game state, not to receive anything.
-        print "Got a message. Cool."
+        print ("Received from WS:", message)
+        tokens = message.split()
+
+        if tokens[0] == "click":
+            the_bb.onclick( (int(tokens[1]), int(tokens[2])) )
+        
+        else:
+            print "Got unknown message"
   
     def on_close(self):
         self.alive = False
