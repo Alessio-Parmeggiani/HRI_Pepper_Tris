@@ -22,6 +22,7 @@
         <BehaviorDescription name="behavior" src="daniele/gesture_turn_2" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/sleeping_gesture" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="daniele/shake_head_gesture" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/confused" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

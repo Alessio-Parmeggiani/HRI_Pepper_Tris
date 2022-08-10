@@ -135,6 +135,9 @@ def play_game(difficulty_bias, pepper_player):
     #TODO placeholder for loading
     game = Tris()
     agent = Agent(game, pepper_player, difficulty_bias)
+    # send initial board to tablet
+    web_board=game.get_board_for_tablet()
+    ws_handler.send(web_board)
     
     #START MATCH
     while not game.get_game_over_and_winner()[0]:
@@ -213,6 +216,7 @@ def interact():
             print ""
 
             pepper_won = winner == pepper_player
+            human_won = winner == human_player
     
             if pepper_won:
                 pepper_score += 1
@@ -223,7 +227,7 @@ def interact():
                 pepper_cmd.robot.say('I win')
                 win.wait()
 
-            else:
+            elif human_won:
                 human_score += 1
                 pepper_player = Tris.X
                 human_player = Tris.O
@@ -231,8 +235,14 @@ def interact():
                 lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
                 pepper_cmd.robot.say('Oh no')
                 lose.wait()
-            
-            # TODO handle draw (no player change, no score change (thus no difficulty change), new behaviors)
+
+            else:
+                # no score change
+                # no player change
+
+                draw = BehaviorWaitable("tris-behaviours-25/francesco/confused")
+                pepper_cmd.robot.say("Huh? It's a draw...")
+                draw.wait()
 
             print ("score", "pepper", pepper_score, "human", human_score)
             
@@ -251,10 +261,11 @@ def interact():
 
             if play_again:
                 if pepper_won:
-                    pepper_cmd.robot.say("Alright, I'll go easy on you. Take X.")
-                else:
+                    pepper_cmd.robot.say("Alright, I'll go easy on you. Take CROSS.")
+                elif human_won:
                     pepper_cmd.robot.say("I have to try harder... Take CIRCLE.")
-                # TODO handle draw (new sentence to say in here)
+                else:
+                    pepper_cmd.robot.say("Very well, let's break the tie!")
 
         ### end while
 
@@ -283,6 +294,7 @@ the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
 #wait for connection
+print "Reminder: open browser to 127.0.0.1:8888/web/index.html"
 while not the_bb.the_handler:
     pass
 
