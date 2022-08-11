@@ -24,8 +24,8 @@ class Blackboard():
     def __init__(self):
         self.the_handler = None
         self.clicked_move = None
-        self.user_experience=None
-        self.user_age=None
+        self.user_experience = None
+        self.user_age = None
     
     def onclick(self, move):
         if not self.clicked_move:
@@ -130,12 +130,14 @@ def play_game(difficulty_bias, pepper_player):
 
     global game
 
+    ws_handler.send("event loading-start")
     print "initializing game...."
     pepper_cmd.robot.say("Please wait while I load the game...")
-    #TODO placeholder for loading
+    #TODO placeholder for loading (done now?)
     game = Tris()
     agent = Agent(game, pepper_player, difficulty_bias)
     # send initial board to tablet
+    ws_handler.send("event loading-complete")
     web_board=game.get_board_for_tablet()
     ws_handler.send(web_board)
     
@@ -184,6 +186,10 @@ def interact():
         #SET PARAMETERS FOR PLAY
         pepper_player = Tris.X
         human_player = Tris.O
+        the_bb.user_experience = None
+        the_bb.user_age = None
+
+        ws_handler.send("event interaction-begin")
 
         point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
         pepper_cmd.robot.say("Please select a difficulty level on my tablet")
@@ -280,6 +286,8 @@ def interact():
         goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
         pepper_cmd.robot.say('Oh, okay. Goodbye.')
         goodbye.wait()
+    
+    ws_handler.send("event interaction-end")
 
 ### end interact()
 
@@ -294,7 +302,7 @@ the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
 #wait for connection
-print "Reminder: open browser to 127.0.0.1:8888/web/index.html"
+print "Reminder: open browser at 127.0.0.1:8888/web/index.html"
 while not the_bb.the_handler:
     pass
 

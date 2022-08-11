@@ -5,8 +5,15 @@
 		<script src="script.js"></script>
 	</head>
 	<body onload="body_loaded()">
+
+		<div class="page" id="idle">
+			<h1>Hi! Wanna play Tic-Tac-Toe?</h1>
+
+			<h2>Approach me to play!</h2>
+		</div>
+
 		
-		<div id="age-select">
+		<div class="page" id="age-select" hidden>
 			<h1>How old are you?</h1>
 
 			<div class="age-grid">
@@ -18,7 +25,7 @@
 		</div>
 		
 
-		<div id="experience-select" hidden>
+		<div class="page" id="experience-select" hidden>
 			<h1>How strong are you at tic-tac-toe?</h1>
 
 			<div class="experience-flex">
@@ -28,7 +35,14 @@
 		</div>
 
 
-		<div id="game" hidden>
+		<div class="page" id="loading" hidden>
+			<h1>Loading...</h1>
+
+			<img src="pepper-badge-rotating.gif"/>
+		</div>
+
+
+		<div class="page" id="game" hidden>
 			<h1>Play with me!</h1>
 
 			<div class="container">

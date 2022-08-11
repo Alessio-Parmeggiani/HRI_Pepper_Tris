@@ -3,6 +3,8 @@ console.log("Hello world")
 
 function body_loaded() {
 
+  const pages = document.getElementsByClassName("page");
+
   const board_matrix = [
     [document.getElementById("t00"), document.getElementById("t01"), document.getElementById("t02")],
     [document.getElementById("t10"), document.getElementById("t11"), document.getElementById("t12")],
@@ -25,13 +27,49 @@ function body_loaded() {
 
   socket.onopen = function(e) {
     console.log("[WS open] Connection established");
-    console.log("Sending to server");
-    socket.send("Hello world");
+    // console.log("Sending to server");
+    // socket.send("Hello world");
   };
 
   socket.onmessage = function(event) {
     const msg = event.data;
     console.log(`[WS message] Data received from server: ${msg}`);
+
+    // check if it's an event message
+    tokens = msg.split(" ");
+    if (tokens[0] == "event") {
+
+      if (tokens[1] == "interaction-begin") {
+        document.getElementById("idle").hidden = true;
+        document.getElementById("age-select").hidden = false;
+      }
+
+      else if (tokens[1] == "interaction-end") {
+        for (let i = 0; i < pages.length; i++) {
+          pages[i].hidden = true;
+        };
+        document.getElementById("idle").hidden = false;
+      }
+
+      else if (tokens[1] == "loading-start") {
+        for (let i = 0; i < pages.length; i++) {
+          pages[i].hidden = true;
+        };
+        document.getElementById("loading").hidden = false;
+      }
+
+      else if (tokens[1] == "loading-complete") {
+        document.getElementById("loading").hidden = true;
+        document.getElementById("game").hidden = false;
+      }
+
+      console.error("[WS message] Event unrecognized.");
+
+      return;
+
+    }
+
+    // if it's not an event, it's a board message
 
     if (msg.length != 9) {
       console.error("[WS message] Message malformed, its length is not 9");
@@ -89,7 +127,7 @@ function body_loaded() {
       socket.send("experience "+exp);
       console.log("experience "+exp);
       document.getElementById("experience-select").hidden = true;
-      document.getElementById("game").hidden = false;
+      document.getElementById("loading").hidden = false;
     }
   }
 

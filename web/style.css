@@ -12,6 +12,8 @@
     --o-color: blue;
 }
 
+/* The .page class does nothing here, it's useful to select all pages from the JS*/
+
 .age-grid {
     margin: 3%;
     display: grid;
