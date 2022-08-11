@@ -1,6 +1,7 @@
 import os, sys
 import math
 import time
+import random   # choice for responses
 
 sys.path.append(os.getenv('PEPPER_TOOLS_HOME')+'/cmd_server')
 
@@ -77,7 +78,7 @@ def pepper_turn(agent):
 
 ### end pepper_turn()
 
-def player_turn(agent):
+def player_turn(agent, pepper_player, human_player):
     point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
     pepper_cmd.robot.say('Your move :)')
     #point_tablet.wait()     
@@ -106,7 +107,7 @@ def player_turn(agent):
             if valid:
                 break
             else: # invalid move
-                # TODO invalid move gest
+                gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
                 pepper_cmd.robot.say("You can't play there!")
                 print "invalid move"
         else: # ASR timed out
@@ -116,17 +117,34 @@ def player_turn(agent):
             if impatience_score+1 < len(pepper_responses):
                 impatience_score += 1
         
-    agent.on_opponent_move(player_move)
+    human_did_optimal_move = agent.on_opponent_move(player_move)
 
-    #TODO feedback
-    pepper_cmd.robot.say('Good move :)')
+    # feedback
+    # pepper uses its own reasoning to check if the human made the best possible move, and reacts accordingly.
+    # otherwise, a fine rating of the move based on the minimax scores was deemed unnecessarily complex,
+    # but we can still look at the board for obvious signs, namely win threats.
+    #TODO pepper should comment its own moves too.
+    #     should make it so that pepper will either comment the human's move or its own, never both (don't wanna overload the "say" queue).
+    optimal_responses = ["Wow, great move!", "You're so good"]    # human did optimal move
+    good_responses = ["Ah, so that's your move", "Nice move"]     # human threatens win
+    neutral_responses = ["I see", "Okay"]                         # everything else
+    bad_responses = ["Are you sure about that?", "Mhh..."]        # human leaves Pepper win open
+    if human_did_optimal_move:
+        pepper_cmd.robot.say(random.choice(optimal_responses))
+    elif game.player_is_threatening(pepper_player):
+        pepper_cmd.robot.say(random.choice(bad_responses))
+    elif game.player_is_threatening(human_player):
+        pepper_cmd.robot.say(random.choice(good_responses))
+    else:
+        pepper_cmd.robot.say(random.choice(neutral_responses))
+
 
 ### end player_turn()
 
 
 # In which Pepper plays ONE game
 # returns the winner: Tris.X, Tris.O, Tris.DRAW
-def play_game(difficulty_bias, pepper_player):
+def play_game(difficulty_bias, pepper_player, human_player):
 
     global game
 
@@ -147,7 +165,7 @@ def play_game(difficulty_bias, pepper_player):
         if game.get_current_player() == pepper_player:
             pepper_turn(agent)
         else:
-            player_turn(agent)
+            player_turn(agent, pepper_player, human_player)
         
         # update tablet
         web_board=game.get_board_for_tablet()
@@ -214,7 +232,7 @@ def interact():
         
         while play_again:
             #initialize board and play
-            winner = play_game(difficulty_bias, pepper_player)
+            winner = play_game(difficulty_bias, pepper_player, human_player)
 
             print "^_^"
             print ""

@@ -51,6 +51,10 @@ class Tris:
     def get_game_over_and_winner(self):
         return get_game_over_and_winner(self.board)    # w/o `self.` it refers to the global method outside
     
+    #check if a player may win next move
+    def player_is_threatening(self, player):
+        return player_is_threatening(self.board, player)    # w/o `self.` it refers to the global method outside
+    
     #print class in pretty way
     def __str__(self):
         s = ''
@@ -95,6 +99,28 @@ def get_game_over_and_winner(board):
                 
     #there is a draw
     return True, Tris.DRAW
+
+# a player threatens a win if there is a row, col or diag where two spaces have its symbol and the third is empty.
+# first an aux
+def set_is_threatened(tile1, tile2, tile3, player):
+    return (tile1 == tile2 == player and tile3 == Tris.EMPTY) or \
+           (tile2 == tile3 == player and tile1 == Tris.EMPTY) or \
+           (tile3 == tile1 == player and tile2 == Tris.EMPTY)
+# then the real thing
+def player_is_threatening(board, player):
+    # check rows
+    for row in board:
+        if set_is_threatened(row[0], row[1], row[2], player):
+            return True
+    # check columns
+    for col in range(3):
+        if set_is_threatened(board[0][col], board[1][col], board[2][col], player):
+            return True
+    # check diagonals
+    if set_is_threatened(board[0][0], board[1][1], board[2][2], player):
+        return True
+    if set_is_threatened(board[0][2], board[1][1], board[2][0], player):
+        return True, board[0][2]
 
 
 #test

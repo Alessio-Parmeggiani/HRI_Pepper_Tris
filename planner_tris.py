@@ -166,3 +166,11 @@ class GameTree:
         else:
             print "doing optimal move"
             return self.get_optimal_move()
+
+
+    # evaluates the optimality of a given move,
+    # checking if its score is the same as the optimal move
+    def move_is_optimal(self, move):
+        optimal_score = self.get_optimal_move()[1]
+        my_score = self.get_child_by_move(move).get_optimal_move()[1] # effectively this should just force one child in the for and then continue normally
+        return my_score == optimal_score

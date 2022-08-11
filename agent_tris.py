@@ -18,6 +18,7 @@ class Agent:
         return move
     
     def on_opponent_move(self, move):
+        opp_made_optimal_move = self.tree.move_is_optimal(move)
         # maintain only the tree with the chosen move
         self.tree = self.tree.get_child_by_move(move)
-        return
+        return opp_made_optimal_move
