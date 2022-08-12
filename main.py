@@ -12,6 +12,7 @@ from behavior_waitable import BehaviorWaitable
 from tris import *
 from planner_tris import *
 from agent_tris import *
+from proxemics import *
 
 import threading
 from webserver import go
@@ -105,34 +106,59 @@ def player_turn(agent, pepper_player, human_player):
         "tris-behaviours-25/daniele/sleeping_gesture",
     ]
     player_move = None
+    game_paused = False
+    game_pause_countdown = 0
     #TODO led waiting
     while True:
-        timeout = 7 + 6*random.random()
-        response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
+        if proxemics.is_in_zone_for_delay(10,proxemics.AWAY_ZONE):
+            #the user left, after 10 seconds the game is paused. Delay can be affected by the random delay below
+            if not game_paused:
+                print "user left"
+                ws_handler.send("event pause-game")
+                game_paused = True
+                game_pause_countdown = 3 #countdown to go back to main screen
+            
+            print "countdown: " + str(game_pause_countdown)
+            if game_pause_countdown == 1:
+                ws_handler.send("event pause-game-warning")
+            if game_pause_countdown == 0:
+                raise Exception("user_left_timeout")
+            game_pause_countdown -= 1
+            
+        elif game_paused:
+            if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
+                #the user came back, the game is resumed
+                print "user came back"
+                ws_handler.send("event resume-game")
+                pepper_cmd.robot.say("Glad to see you back! It's your turn now.")
+                game_paused = False
+        else:
+            timeout = 7 + 6*random.random()
+            response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
 
-        # don't do anything else if the move was done via click
-        if the_bb.clicked_move:
-            player_move = the_bb.clicked_move
-            the_bb.clicked_move = None
-            break
-
-        if response:
-            player_move = parse_move(response)
-            valid = game.move(*player_move)
-            if valid:
+            # don't do anything else if the move was done via click
+            if the_bb.clicked_move:
+                player_move = the_bb.clicked_move
+                the_bb.clicked_move = None
                 break
-            else: # invalid move
-                gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
-                pepper_cmd.robot.say("You can't play there!")
-                print "invalid move"
-        else: # ASR timed out
-            gest = BehaviorWaitable(impatience_gestures[impatience_score])
-            pepper_cmd.robot.say(impatience_responses[impatience_score])
 
-            impatience_score += 1
+            if response:
+                player_move = parse_move(response)
+                valid = game.move(*player_move)
+                if valid:
+                    break
+                else: # invalid move
+                    gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
+                    pepper_cmd.robot.say("You can't play there!")
+                    print "invalid move"
+            else: # ASR timed out
+                gest = BehaviorWaitable(impatience_gestures[impatience_score])
+                pepper_cmd.robot.say(impatience_responses[impatience_score])
 
-            if impatience_score >= len(impatience_responses):
-                impatience_score = 2    # loop the most impatient ones
+                impatience_score += 1
+
+                if impatience_score >= len(impatience_responses):
+                    impatience_score = 2    # loop the most impatient ones
         
     human_did_optimal_move = agent.on_opponent_move(player_move)
 
@@ -202,15 +228,16 @@ def play_game(difficulty_bias, pepper_player, human_player):
 
 
 # This includes all the interaction with a new user
-def interact():
+def interact(debug = False):
+    pepper_cmd.robot.say("Hello, I'm Pepper. I'm here to play Tris. Wanna play?")
 
-    pepper_cmd.robot.say('Hello')
-    pepper_cmd.robot.say('Wanna play tris?')
+    #pepper_cmd.robot.say('Hello')
+    #pepper_cmd.robot.say('Wanna play tris?')
     response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
-
-    print "FORCING YES"   # DEBUG ONLY; TODO remove
-    response = "yes!!!"
+    if debug:
+        print "[debug]: FORCING YES"
+        response = "yes!!!"
     
     if "yes" in response:
         # TODO
@@ -229,7 +256,12 @@ def interact():
         point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
         pepper_cmd.robot.say("Please select a difficulty level on my tablet")
         while not the_bb.user_age or not the_bb.user_experience: 
-            #wait for difficulty input 
+            #if 10 seconds are passed without any proximity signal, nor any interaction, go back to the main screen
+            if proxemics.is_in_zone_for_delay(10, proxemics.AWAY_ZONE):
+                #TODO ? gesture or speak to go back
+                print "you were away for too long, going back to main screen"
+                ws_handler.send("event interaction-end")
+                return
             pass
 
 
@@ -249,7 +281,12 @@ def interact():
         
         while play_again:
             #initialize board and play
-            winner = play_game(difficulty_bias, pepper_player, human_player)
+            try:
+                winner = play_game(difficulty_bias, pepper_player, human_player)
+            except Exception as e:
+                print "exception: ", e
+                ws_handler.send("event interaction-end")
+                return
 
             print "^_^"
             print ""
@@ -298,6 +335,11 @@ def interact():
             
             pepper_cmd.robot.say('Wanna play again?')
             response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
+
+            if debug:
+                print "[debug]: FORCING NO"
+                response = "no thanks"
+
             play_again = "yes" in response
 
             if play_again:
@@ -333,6 +375,7 @@ begin()
 
 the_bb = Blackboard()
 
+proxemics = ProxemicsInfo()
 the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
@@ -343,12 +386,14 @@ while not the_bb.the_handler:
 
 ws_handler = the_bb.the_handler
 
+#DEBUG: forcing sonar to measure always the robot in the CASUAL_ZONE
+proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
+
 while True:
 
-    # TODO wait for sonar
-
-    interact()
-
+    if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
+        ws_handler.send("event user-approached")
+        interact(debug=True) #TODO remove debug flag
     time.sleep(2)
 
 

@@ -39,9 +39,30 @@ function body_loaded() {
     tokens = msg.split(" ");
     if (tokens[0] == "event") {
 
-      if (tokens[1] == "interaction-begin") {
+      if (tokens[1] == "user-approached") {
         document.getElementById("idle").hidden = true;
+        document.getElementById("idle-approached").hidden = false;
+      }
+
+      else if (tokens[1] == "interaction-begin") {
+        document.getElementById("idle-approached").hidden = true;
         document.getElementById("age-select").hidden = false;
+      }
+
+      else if (tokens[1] == "pause-game") {
+        document.getElementById("game-pause").hidden = false;
+        document.getElementById("game-pause-warning").hidden = true;
+        document.getElementById("game").hidden = true;
+      }
+
+      else if (tokens[1] == "pause-game-warning") {
+        document.getElementById("game-pause-warning").hidden = false;
+      }
+
+      else if (tokens[1] == "resume-game") {
+        document.getElementById("game-pause").hidden = true;
+        document.getElementById("game").hidden = false;
+
       }
 
       else if (tokens[1] == "interaction-end") {
