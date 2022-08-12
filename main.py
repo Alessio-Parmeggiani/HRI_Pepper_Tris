@@ -12,6 +12,7 @@ from behavior_waitable import BehaviorWaitable
 from tris import *
 from planner_tris import *
 from agent_tris import *
+from proxemics import *
 
 import threading
 from webserver import go
@@ -322,6 +323,7 @@ begin()
 
 the_bb = Blackboard()
 
+proxemics = ProxemicsInfo()
 the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
@@ -331,6 +333,9 @@ while not the_bb.the_handler:
     pass
 
 ws_handler = the_bb.the_handler
+
+#DEBUG: forcing sonar to measure always the robot in the CASUAL_ZONE
+proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
 
 while True:
 
