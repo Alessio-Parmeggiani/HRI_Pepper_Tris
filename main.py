@@ -214,7 +214,12 @@ def interact(debug = False):
         point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
         pepper_cmd.robot.say("Please select a difficulty level on my tablet")
         while not the_bb.user_age or not the_bb.user_experience: 
-            #wait for difficulty input 
+            #if 10 seconds are passed without any proximity signal, nor any interaction, go back to the main screen
+            if proxemics.is_in_zone_for_delay(10, proxemics.AWAY_ZONE):
+                #TODO ? gesture or speak to go back
+                print "you were away for too long, going back to main screen"
+                ws_handler.send("event interaction-end")
+                return
             pass
 
 
