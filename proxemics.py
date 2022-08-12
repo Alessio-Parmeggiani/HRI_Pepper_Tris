@@ -8,6 +8,11 @@ sys.path.append(os.getenv('PEPPER_TOOLS_HOME')+'/cmd_server')
 import pepper_cmd
 from pepper_cmd import robot
 
+#to simulate sonar values:
+#python ~/src/pepper_tools/sonar/sonar_sim.py --value 1.6 --duration 20
+#value, in our case, above 2.0 is considered "AWAY", below is considered "NEAR"
+#duration can be less than 20, it is recommended to be =20 for the testing during the game
+
 class ProxemicsInfo(object):
     '''
         This class uses Sonar front and back sensors in order to measure the area of proximity.
@@ -34,6 +39,7 @@ class ProxemicsInfo(object):
         #initialize outliar values
         self.outliar_values = outliar_values
         self.last_true_distance_time = None
+        self.forcing_value = None # useful for debugging
 
     def __del__(self):
         self.stop_sensors()
@@ -44,18 +50,25 @@ class ProxemicsInfo(object):
         '''
         if pepper_cmd.robot.sensorThread != None:
             pepper_cmd.robot.stopSensorMonitor()
-        
+
+    #DEBUG MODE
+    def begin_forcing_zone(self, zone):
+        '''force the robot to be in a zone. Valid until the call to stop_forcing_zone()'''
+        self.forcing_value = zone
+    def stop_forcing_zone(self):
+        '''stop forcing the robot to be in a zone'''
+        self.forcing_value = None
 
     ## GET CURRENT VALUES
     def frontValue(self):
         '''get current useful value from front sensor'''
-        val = pepper_cmd.robot.sonar[0]
+        val = pepper_cmd.robot.sonar[0] if self.forcing_value == None else self.forcing_value
         return val if val not in self.outliar_values else self.last_front_value #filter out outliars measurements
 
-    def backValue(self):
-        '''get current useful value from back sensor'''
-        val = pepper_cmd.robot.sonar[1]
-        return val if val not in self.outliar_values else self.last_back_value #filter out outliars measurements
+    #def backValue(self):
+    #    '''get current useful value from back sensor'''
+    #    val = pepper_cmd.robot.sonar[1]
+    #    return val if val not in self.outliar_values else self.last_back_value #filter out outliars measurements
 
     ## GET DISTANCE IN TERMS OF AREA OF PROXIMITY
     def zoneFromDistance(self, distance):
@@ -75,7 +88,7 @@ class ProxemicsInfo(object):
     def update_measurements(self):
         '''update stored measurements'''
         self.last_front_value = self.frontValue()
-        self.last_back_value = self.backValue()
+        #self.last_back_value = self.backValue()
 
     #EXTERNAL FUNCTIONS - every call may also updates the stored measurements
     def get_proximity_zone(self):
