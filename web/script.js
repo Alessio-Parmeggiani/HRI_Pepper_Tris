@@ -39,8 +39,13 @@ function body_loaded() {
     tokens = msg.split(" ");
     if (tokens[0] == "event") {
 
-      if (tokens[1] == "interaction-begin") {
+      if (tokens[1] == "user-approached") {
         document.getElementById("idle").hidden = true;
+        document.getElementById("idle-approached").hidden = false;
+      }
+
+      else if (tokens[1] == "interaction-begin") {
+        document.getElementById("idle-approached").hidden = true;
         document.getElementById("age-select").hidden = false;
       }
 

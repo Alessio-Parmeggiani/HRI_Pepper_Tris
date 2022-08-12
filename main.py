@@ -339,10 +339,9 @@ proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
 
 while True:
 
-    # TODO wait for sonar
-
-    interact()
-
+    if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
+        ws_handler.send("event user-approached")
+        interact(debug=True) #TODO remove debug flag
     time.sleep(2)
 
 
