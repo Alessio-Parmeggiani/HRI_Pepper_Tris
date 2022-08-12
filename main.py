@@ -185,14 +185,15 @@ def play_game(difficulty_bias, pepper_player, human_player):
 
 
 # This includes all the interaction with a new user
-def interact():
+def interact(debug = False):
+    pepper_cmd.robot.say("Hello, I'm Pepper. I'm here to play Tris. Wanna play?")
 
-    pepper_cmd.robot.say('Hello')
-    pepper_cmd.robot.say('Wanna play tris?')
+    #pepper_cmd.robot.say('Hello')
+    #pepper_cmd.robot.say('Wanna play tris?')
     response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
-
-    print "FORCING YES"   # DEBUG ONLY; TODO remove
+    if debug:
+        print "[debug]: FORCING YES"
     response = "yes!!!"
     
     if "yes" in response:
@@ -281,6 +282,11 @@ def interact():
             
             pepper_cmd.robot.say('Wanna play again?')
             response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
+
+            if debug:
+                print "[debug]: FORCING NO"
+                response = "no thanks"
+
             play_again = "yes" in response
 
             if play_again:
