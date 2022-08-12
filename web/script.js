@@ -49,6 +49,22 @@ function body_loaded() {
         document.getElementById("age-select").hidden = false;
       }
 
+      else if (tokens[1] == "pause-game") {
+        document.getElementById("game-pause").hidden = false;
+        document.getElementById("game-pause-warning").hidden = true;
+        document.getElementById("game").hidden = true;
+      }
+
+      else if (tokens[1] == "pause-game-warning") {
+        document.getElementById("game-pause-warning").hidden = false;
+      }
+
+      else if (tokens[1] == "resume-game") {
+        document.getElementById("game-pause").hidden = true;
+        document.getElementById("game").hidden = false;
+
+      }
+
       else if (tokens[1] == "interaction-end") {
         for (let i = 0; i < pages.length; i++) {
           pages[i].hidden = true;

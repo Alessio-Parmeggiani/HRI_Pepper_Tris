@@ -91,32 +91,57 @@ def player_turn(agent, pepper_player, human_player):
     impatience_score = 0
     pepper_responses = ["your turn", "come on", "i'm sleeping", "uff..."]
     player_move = None
+    game_paused = False
+    game_pause_countdown = 0
     #TODO led waiting
     while True:
-        timeout = 7 + 6*random.random()
-        response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
+        if proxemics.is_in_zone_for_delay(10,proxemics.AWAY_ZONE):
+            #the user left, after 10 seconds the game is paused. Delay can be affected by the random delay below
+            if not game_paused:
+                print "user left"
+                ws_handler.send("event pause-game")
+                game_paused = True
+                game_pause_countdown = 3 #countdown to go back to main screen
+            
+            print "countdown: " + str(game_pause_countdown)
+            if game_pause_countdown == 1:
+                ws_handler.send("event pause-game-warning")
+            if game_pause_countdown == 0:
+                raise Exception("user_left_timeout")
+            game_pause_countdown -= 1
+            
+        elif game_paused:
+            if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
+                #the user came back, the game is resumed
+                print "user came back"
+                ws_handler.send("event resume-game")
+                pepper_cmd.robot.say("Glad to see you back! It's your turn now.")
+                game_paused = False
+        else:
+            timeout = 7 + 6*random.random()
+            response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
 
-        # don't do anything else if the move was done via click
-        if the_bb.clicked_move:
-            player_move = the_bb.clicked_move
-            the_bb.clicked_move = None
-            break
-
-        if response:
-            player_move = parse_move(response)
-            valid = game.move(*player_move)
-            if valid:
+            # don't do anything else if the move was done via click
+            if the_bb.clicked_move:
+                player_move = the_bb.clicked_move
+                the_bb.clicked_move = None
                 break
-            else: # invalid move
-                gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
-                pepper_cmd.robot.say("You can't play there!")
-                print "invalid move"
-        else: # ASR timed out
-            gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
-            pepper_cmd.robot.say(pepper_responses[impatience_score])
 
-            if impatience_score+1 < len(pepper_responses):
-                impatience_score += 1
+            if response:
+                player_move = parse_move(response)
+                valid = game.move(*player_move)
+                if valid:
+                    break
+                else: # invalid move
+                    gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
+                    pepper_cmd.robot.say("You can't play there!")
+                    print "invalid move"
+            else: # ASR timed out
+                gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
+                pepper_cmd.robot.say(pepper_responses[impatience_score])
+
+                if impatience_score+1 < len(pepper_responses):
+                    impatience_score += 1
         
     human_did_optimal_move = agent.on_opponent_move(player_move)
 
@@ -195,7 +220,7 @@ def interact(debug = False):
 
     if debug:
         print "[debug]: FORCING YES"
-    response = "yes!!!"
+        response = "yes!!!"
     
     if "yes" in response:
         # TODO
@@ -239,7 +264,12 @@ def interact(debug = False):
         
         while play_again:
             #initialize board and play
-            winner = play_game(difficulty_bias, pepper_player, human_player)
+            try:
+                winner = play_game(difficulty_bias, pepper_player, human_player)
+            except Exception as e:
+                print "exception: ", e
+                ws_handler.send("event interaction-end")
+                return
 
             print "^_^"
             print ""
