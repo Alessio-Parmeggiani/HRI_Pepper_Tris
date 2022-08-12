@@ -88,6 +88,10 @@
   </behaviorContent>
   <behaviorContent path="francesco/shake_head_2">
    <nature>interactive</nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="francesco/gesture_turn_3">
+   <nature>interactive</nature>
    <triggerSentences/>
    <loadingResponses/>
    <autonomous/>

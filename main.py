@@ -80,7 +80,7 @@ def pepper_turn(agent):
 
 def player_turn(agent, pepper_player, human_player):
     point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
-    pepper_cmd.robot.say('Your move :)')
+    pepper_cmd.robot.say(random.choice(('Your move :)', 'Your turn', 'Go', "What will you do?")))
     #point_tablet.wait()     
     #human move
     #recognize move speech
@@ -88,7 +88,22 @@ def player_turn(agent, pepper_player, human_player):
                               "1 A", "2 A", "3 A", "1 B", "2 B", "3 B", "1 C", "2 C", "3 C",]
     response = ""  # the default response from pepper_cmd's ASR
     impatience_score = 0
-    pepper_responses = ["your turn", "come on", "i'm sleeping", "uff..."]
+    impatience_responses = [
+        "Hey, it's your turn",
+        "Please, make a move",
+        "Come on",
+        "Don't think too hard",
+        "Just pick a tile",
+        "Entering sleep mode... Just kidding."
+    ]
+    impatience_gestures =  [
+        "tris-behaviours-25/daniele/gesture_turn_1",
+        "tris-behaviours-25/daniele/gesture_turn_1",
+        "tris-behaviours-25/francesco/gesture_turn_3",
+        "tris-behaviours-25/daniele/gesture_turn_1",
+        "tris-behaviours-25/francesco/gesture_turn_3",
+        "tris-behaviours-25/daniele/sleeping_gesture",
+    ]
     player_move = None
     #TODO led waiting
     while True:
@@ -111,11 +126,13 @@ def player_turn(agent, pepper_player, human_player):
                 pepper_cmd.robot.say("You can't play there!")
                 print "invalid move"
         else: # ASR timed out
-            gest = BehaviorWaitable("tris-behaviours-25/daniele/gesture_turn_1")  # TODO change gest w/ impatience
-            pepper_cmd.robot.say(pepper_responses[impatience_score])
+            gest = BehaviorWaitable(impatience_gestures[impatience_score])
+            pepper_cmd.robot.say(impatience_responses[impatience_score])
 
-            if impatience_score+1 < len(pepper_responses):
-                impatience_score += 1
+            impatience_score += 1
+
+            if impatience_score >= len(impatience_responses):
+                impatience_score = 2    # loop the most impatient ones
         
     human_did_optimal_move = agent.on_opponent_move(player_move)
 
