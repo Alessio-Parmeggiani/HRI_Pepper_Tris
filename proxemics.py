@@ -2,6 +2,7 @@
 #http://doc.aldebaran.com/2-4/family/pepper_technical/sonar_pep.html
 
 import os, sys
+from datetime import datetime
 sys.path.append(os.getenv('PEPPER_TOOLS_HOME')+'/cmd_server')
 
 import pepper_cmd
@@ -32,6 +33,7 @@ class ProxemicsInfo(object):
         self.last_back_value = 5
         #initialize outliar values
         self.outliar_values = outliar_values
+        self.last_true_distance_time = None
 
     def __del__(self):
         self.stop_sensors()
@@ -83,6 +85,32 @@ class ProxemicsInfo(object):
         '''
         self.update_measurements()
         return self.zoneFromDistance(self.last_front_value)
+
+    def is_in_zone_for_delay(self, delay, zone):
+        '''
+            returns a boolean value indicating if the robot is in a zone for a given delay
+            if the actual zone is equals to the passed zone, for a certain amount of time (delay), returns True after delay.
+            if the actual zone is not equals to the passed zone or the delay is still not fully passed, returns False.
+            Delay: time in seconds
+            Zone: zone to check (INTIMATE_ZONE, CASUAL_ZONE, SOCIO_CONSULTIVE_ZONE, AWAY_ZONE)
+        '''
+        actual_time = datetime.now()
+
+        if zone != self.get_proximity_zone():
+            #zone is not the same. reset time
+            self.last_true_distance_time = None
+        elif self.last_true_distance_time == None:
+            #start time
+            self.last_true_distance_time = actual_time
+        
+        if self.last_true_distance_time != None and (actual_time - self.last_true_distance_time).total_seconds() > delay:
+            #time is expired. 
+            #reset time and return True
+            self.last_true_distance_time = None
+            return True
+
+        return False # timer is not expired yet
+
 
     def did_change_front_zone(self):
         ''' 
