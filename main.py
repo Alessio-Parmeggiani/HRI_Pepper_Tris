@@ -13,6 +13,7 @@ from tris import *
 from planner_tris import *
 from agent_tris import *
 from proxemics import *
+from leds import *
 
 import threading
 from webserver import go
@@ -20,6 +21,7 @@ from webserver import go
 vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
 game = None    # Blackboard needs this global, and Pepper can only play one game at a time regardless
 
+pepper_leds=None;
 # classes for the webserver
 
 class Blackboard():
@@ -71,11 +73,15 @@ def parse_move(response):
 
 
 def pepper_turn(agent):
+    thinking_time = random.uniform(1,3)
+    pepper_cmd.robot.say("Thinking ...")
+    pepper_leds.thinking(total_duration=thinking_time)
+    #TODO gesture for thinking
+
     pepper_move = agent.on_my_turn()
     game.move(*pepper_move)
 
-    #TODO thinking led
-    #TODO gesture
+    
 
 ### end pepper_turn()
 
@@ -134,15 +140,19 @@ def player_turn(agent, pepper_player, human_player):
                 game_paused = False
         else:
             timeout = 7 + 6*random.random()
-            response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
+            pepper_leds.waiting(duration=timeout)
 
+            response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
+            
             # don't do anything else if the move was done via click
             if the_bb.clicked_move:
+                pepper_leds.default()
                 player_move = the_bb.clicked_move
                 the_bb.clicked_move = None
                 break
 
             if response:
+                pepper_leds.default()
                 player_move = parse_move(response)
                 valid = game.move(*player_move)
                 if valid:
@@ -151,10 +161,11 @@ def player_turn(agent, pepper_player, human_player):
                     gest = BehaviorWaitable("tris-behaviours-25/daniele/shake_head_gesture")
                     pepper_cmd.robot.say("You can't play there!")
                     print "invalid move"
+
             else: # ASR timed out
                 gest = BehaviorWaitable(impatience_gestures[impatience_score])
                 pepper_cmd.robot.say(impatience_responses[impatience_score])
-
+                
                 impatience_score += 1
 
                 if impatience_score >= len(impatience_responses):
@@ -174,12 +185,14 @@ def player_turn(agent, pepper_player, human_player):
     bad_responses = ["Are you sure about that?", "Mhh..."]        # human leaves Pepper win open
     if human_did_optimal_move:
         pepper_cmd.robot.say(random.choice(optimal_responses))
+
     elif game.player_is_threatening(pepper_player):
         pepper_cmd.robot.say(random.choice(bad_responses))
     elif game.player_is_threatening(human_player):
         pepper_cmd.robot.say(random.choice(good_responses))
     else:
         pepper_cmd.robot.say(random.choice(neutral_responses))
+
 
 
 ### end player_turn()
@@ -303,6 +316,7 @@ def interact(debug = False):
 
                 win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
                 pepper_cmd.robot.say('I win')
+                pepper_leds.winning()
                 win.wait()
 
             elif human_won:
@@ -312,6 +326,7 @@ def interact(debug = False):
     
                 lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
                 pepper_cmd.robot.say('Oh no')
+                pepper_leds.losing()
                 lose.wait()
 
             else:
@@ -320,6 +335,7 @@ def interact(debug = False):
 
                 draw = BehaviorWaitable("tris-behaviours-25/francesco/confused")
                 pepper_cmd.robot.say("Huh? It's a draw...")
+                pepper_leds.neutral()
                 draw.wait()
 
             print ("score", "pepper", pepper_score, "human", human_score)
@@ -385,6 +401,9 @@ while not the_bb.the_handler:
     pass
 
 ws_handler = the_bb.the_handler
+
+pepper_leds=Leds()
+pepper_leds.default()
 
 #DEBUG: forcing sonar to measure always the robot in the CASUAL_ZONE
 proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
