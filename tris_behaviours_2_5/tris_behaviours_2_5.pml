@@ -25,6 +25,7 @@
         <BehaviorDescription name="behavior" src="francesco/confused" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/shake_head_2" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/gesture_turn_3" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/clicked" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>
@@ -34,6 +35,7 @@
         <File name="device-power-down-sound-effect" src="daniele/resources/device-power-down-sound-effect.wav" />
         <File name="device-power-up-sound-effect" src="daniele/resources/device-power-up-sound-effect.wav" />
         <File name="device-power-up-sound-effect_short" src="daniele/resources/device-power-up-sound-effect_short.wav" />
+        <File name="tablet-click" src="francesco/resources/tablet-click.wav" />
     </Resources>
     <Topics />
     <IgnoredPaths />

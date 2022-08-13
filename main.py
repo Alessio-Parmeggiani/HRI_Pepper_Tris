@@ -36,7 +36,9 @@ class Blackboard():
                 self.clicked_move = move
                 web_board=game.get_board_for_tablet()
                 ws_handler.send(web_board)
-                # TODO suono e/o lucetta (no motion)
+                BehaviorWaitable("tris-behaviours-25/francesco/clicked")
+                # TODO vogliamo anche dei LED?
+                pepper_cmd.robot.asr_cancel()    # stop asr so we don't have to wait for the timeout to expire like a pesce lesso
 
 
 class WebServerThread(threading.Thread):
@@ -259,7 +261,8 @@ def interact(debug = False):
             #if 10 seconds are passed without any proximity signal, nor any interaction, go back to the main screen
             if proxemics.is_in_zone_for_delay(10, proxemics.AWAY_ZONE):
                 #TODO ? gesture or speak to go back
-                print "you were away for too long, going back to main screen"
+                #       [francesco] I don't think so, for this specific point it may be better a quiet reset
+                print "user went away during profiling, going back to main screen"
                 ws_handler.send("event interaction-end")
                 return
             pass
@@ -336,10 +339,6 @@ def interact(debug = False):
             pepper_cmd.robot.say('Wanna play again?')
             response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
-            if debug:
-                print "[debug]: FORCING NO"
-                response = "no thanks"
-
             play_again = "yes" in response
 
             if play_again:
@@ -353,9 +352,14 @@ def interact(debug = False):
         ### end while
 
         # get here when user wants to stop playing
-        # TODO Pepper ci dice il punteggio finale?
+        if pepper_score > human_score:
+            pepper_cmd.robot.say("Okay. I won " + str(pepper_score) + " to " + str(human_score) + ". You'll do better next time!")
+        elif human_score > pepper_score:
+            pepper_cmd.robot.say("Okay. You won " + str(pepper_score) + " to " + str(human_score) + ". You're quite good at this!")
+        else:  # draw
+            pepper_cmd.robot.say("Okay. We ended up drawing at " + str(pepper_score) + " even. I had a lot of fun!")
         goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
-        pepper_cmd.robot.say('Oh, okay. Goodbye.')
+        pepper_cmd.robot.say('Come play again soon!')
         goodbye.wait()
 
 
@@ -391,9 +395,18 @@ proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
 
 while True:
 
-    if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
-        ws_handler.send("event user-approached")
-        interact(debug=True) #TODO remove debug flag
+    # if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
+    #     ws_handler.send("event user-approached")
+    #     interact(debug=True) #TODO remove debug flag
+
+    # [francesco] I suggest this:
+    while not (proxemics.get_proximity_zone() < proxemics.AWAY_ZONE):
+        pass     #wait for user to approach
+    # when that happens...
+    ws_handler.send("event user-approached")
+    interact(debug=True) #TODO remove debug flag
+    # so Pepper reacts immediately, not once every 2 seconds
+
     time.sleep(2)
 
 
