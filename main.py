@@ -22,6 +22,12 @@ vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
 game = None    # Blackboard needs this global, and Pepper can only play one game at a time regardless
 
 pepper_leds=None
+
+# thrown if the user leaves during the interaction.
+class UserLeavingException(Exception):
+    pass
+
+
 # classes for the webserver
 
 class Blackboard():
@@ -75,15 +81,15 @@ def parse_move(response):
 
 
 def pepper_turn(agent):
-    # thinking_time = random.uniform(1,3)    # unneeded, we can just wait for the thinking gesture to end
+    thinking_time = random.uniform(1,3)
     think = BehaviorWaitable("tris-behaviours-25/francesco/thinking")
     # TODO 1~2 more, shorter thinking gestures
+    pepper_leds.thinking(total_duration=thinking_time)
     pepper_cmd.robot.say(random.choice((
         "Thinking ...",
         "Let's see...",
         "What to do...?"
     )))
-    #pepper_leds.thinking(total_duration=thinking_time)
     think.wait()
 
     pepper_move, pepper_did_optimal_move = agent.on_my_turn()
@@ -149,7 +155,7 @@ def player_turn(agent, pepper_player, human_player):
             if game_pause_countdown == 1:
                 ws_handler.send("event pause-game-warning")
             if game_pause_countdown == 0:
-                raise Exception("user_left_timeout")
+                raise UserLeavingException("user_left_timeout")
             game_pause_countdown -= 1
             
         elif game_paused:
@@ -161,19 +167,19 @@ def player_turn(agent, pepper_player, human_player):
                 game_paused = False
         else:
             timeout = 7 + 6*random.random()
-            #pepper_leds.waiting(duration=timeout)
+            pepper_leds.waiting(duration=timeout)
 
             response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
             
             # don't do anything else if the move was done via click
             if the_bb.clicked_move:
-                #pepper_leds.default()
+                pepper_leds.default()
                 player_move = the_bb.clicked_move
                 the_bb.clicked_move = None
                 break
 
             if response:
-                #pepper_leds.default()
+                pepper_leds.default()
                 player_move = parse_move(response)
                 valid = game.move(*player_move)
                 if valid:
@@ -317,7 +323,7 @@ def interact(debug = False):
             #initialize board and play
             try:
                 winner = play_game(difficulty_bias, pepper_player, human_player)
-            except Exception as e:
+            except UserLeavingException as e:
                 print "exception: ", e
                 ws_handler.send("event interaction-end")
                 return
@@ -337,7 +343,7 @@ def interact(debug = False):
 
                 win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
                 pepper_cmd.robot.say('I win')
-                #pepper_leds.winning()
+                pepper_leds.winning()
                 win.wait()
 
             elif human_won:
@@ -347,7 +353,7 @@ def interact(debug = False):
     
                 lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
                 pepper_cmd.robot.say('Oh no')
-                #pepper_leds.losing()
+                pepper_leds.losing()
                 lose.wait()
 
             else:
@@ -356,7 +362,7 @@ def interact(debug = False):
 
                 draw = BehaviorWaitable("tris-behaviours-25/francesco/confused")
                 pepper_cmd.robot.say("Huh? It's a draw...")
-                #pepper_leds.neutral()
+                pepper_leds.neutral()
                 draw.wait()
 
             print ("score", "pepper", pepper_score, "human", human_score)
@@ -424,25 +430,20 @@ while not the_bb.the_handler:
 
 ws_handler = the_bb.the_handler
 
-#pepper_leds=Leds()
-#pepper_leds.default()
+pepper_leds=Leds()
+pepper_leds.default()
 
 #DEBUG: forcing sonar to measure always the robot in the CASUAL_ZONE
 proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
 
 while True:
 
-    # if proxemics.get_proximity_zone() < proxemics.AWAY_ZONE:
-    #     ws_handler.send("event user-approached")
-    #     interact(debug=True) #TODO remove debug flag
-
-    # [francesco] I suggest this:
     while not (proxemics.get_proximity_zone() < proxemics.AWAY_ZONE):
         pass     #wait for user to approach
     # when that happens...
     ws_handler.send("event user-approached")
+
     interact(debug=True) #TODO remove debug flag
-    # so Pepper reacts immediately, not once every 2 seconds
 
     time.sleep(2)
 

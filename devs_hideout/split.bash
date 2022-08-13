@@ -9,3 +9,4 @@ tmux split-window -t $SESSION:3 -v -p 25
 tmux send-keys -t $SESSION:3 "cd ~/src/pepper_tools" C-m
 tmux send-keys -t $SESSION:3 "alias say='python asr/human_say.py --sentence'" C-m
 tmux send-keys -t $SESSION:3 "alias tap='python touch/touch_sim.py --sensor'" C-m
+tmux send-keys -t $SESSION:3 "alias sonar='python ~/src/pepper_tools/sonar/sonar_sim.py --value'" C-m
