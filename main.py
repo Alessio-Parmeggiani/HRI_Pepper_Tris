@@ -75,13 +75,32 @@ def parse_move(response):
 
 
 def pepper_turn(agent):
-    thinking_time = random.uniform(1,3)
-    pepper_cmd.robot.say("Thinking ...")
+    # thinking_time = random.uniform(1,3)    # unneeded, we can just wait for the thinking gesture to end
+    think = BehaviorWaitable("tris-behaviours-25/francesco/thinking")
+    # TODO 1~2 more, shorter thinking gestures
+    pepper_cmd.robot.say(random.choice((
+        "Thinking ...",
+        "Let's see...",
+        "What to do...?"
+    )))
     #pepper_leds.thinking(total_duration=thinking_time)
-    #TODO gesture for thinking
+    think.wait()
 
-    pepper_move = agent.on_my_turn()
+    pepper_move, pepper_did_optimal_move = agent.on_my_turn()
     game.move(*pepper_move)
+
+    # pepper announces its own move. The type of message is simply dictated on
+    # whether it picked the optimal move or it went for a more merciful choice.
+    if pepper_did_optimal_move:
+        pepper_cmd.robot.say(random.choice((
+            "Then take this!",
+            "Here's my move!"
+        )))
+    else:
+        pepper_cmd.robot.say(random.choice((
+            "Um, maybe here?",
+            "I'll try this..."
+        )))
 
     
 
@@ -179,15 +198,14 @@ def player_turn(agent, pepper_player, human_player):
     # pepper uses its own reasoning to check if the human made the best possible move, and reacts accordingly.
     # otherwise, a fine rating of the move based on the minimax scores was deemed unnecessarily complex,
     # but we can still look at the board for obvious signs, namely win threats.
-    #TODO pepper should comment its own moves too.
-    #     should make it so that pepper will either comment the human's move or its own, never both (don't wanna overload the "say" queue).
+
     optimal_responses = ["Wow, great move!", "You're so good"]    # human did optimal move
     good_responses = ["Ah, so that's your move", "Nice move"]     # human threatens win
     neutral_responses = ["I see", "Okay"]                         # everything else
     bad_responses = ["Are you sure about that?", "Mhh..."]        # human leaves Pepper win open
+
     if human_did_optimal_move:
         pepper_cmd.robot.say(random.choice(optimal_responses))
-
     elif game.player_is_threatening(pepper_player):
         pepper_cmd.robot.say(random.choice(bad_responses))
     elif game.player_is_threatening(human_player):
