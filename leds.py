@@ -3,6 +3,62 @@ import qi
 import argparse
 import sys
 import pepper_cmd
+import threading
+
+# does the rotateEyes potentially infinitely, performing one turn at a time,
+# until it is requested to stop, then it will terminate at the end of the current cycle.
+class _ThinkingStoppable(threading.Thread):
+    def __init__(self, leds_service, rotation_period):
+        threading.Thread.__init__(self)
+        self.leds_service = leds_service
+        self.rotation_period = rotation_period
+        self.stop_flag = False
+    
+    def run(self):
+        print "THINK LED START"
+        while not self.stop_flag:
+            self.leds_service.rotateEyes(0x00FF0000, self.rotation_period, self.rotation_period)
+        print "THINK LED END"
+    
+    def request_stop(self):
+        self.stop_flag = True
+    
+    def await_stop(self):
+        self.request_stop()
+        self.join()
+
+# does a reimplementation of fadeListRGB potentially infinitely, performing one color at a time,
+# until it is requested to stop, then it will terminate at the end of the current fade.
+# Colrs must be either names or hex code (0x00RRGGBB). Mixed sequences might be allowed.
+# Unlike fadeListRGB, all fades must have the same duration, for simplicity.
+# Not that we wanted to do otherwise.
+class _WaitingStoppable(threading.Thread):
+    def __init__(self, leds_service, leds_name, colors, fade_time):
+        threading.Thread.__init__(self)
+        self.leds_service = leds_service
+        self.leds_name = leds_name
+        self.colors = colors
+        self.fade_time = fade_time
+        self.i = 0
+        self.stop_flag = False
+    
+    def run(self):
+        print "WAIT LED START"
+        while not self.stop_flag:
+            self.leds_service.fadeRGB(
+                self.leds_name,
+                self.colors[self.i],
+                self.fade_time
+            )
+            self.i = (self.i + 1) % len(self.colors)
+        print "WAIT LED END"
+    
+    def request_stop(self):
+        self.stop_flag = True
+    
+    def await_stop(self):
+        self.request_stop()
+        self.join()
 
 class Leds:
     def __init__(self):
@@ -45,10 +101,22 @@ class Leds:
         self.leds_service.fadeListRGB(name, colors, [duration * (i*1.0)/len(colors) for i in xrange(0, len(colors))])
         print "LED END"
     
+    def waiting_parloop(self, fade_time=1, colors=['white', 'red', 'green', 'blue', 'yellow', 'magenta', 'cyan']):
+        # "parallel loop"
+        leds_thread = _WaitingStoppable(self.leds_service, self.group_name, colors, fade_time)
+        leds_thread.start()
+        return leds_thread
+    
     def thinking(self, total_duration=2, rotation_speed=1):
         n_turns=int(total_duration/rotation_speed)
         #rgb code: 0x00RRGGBB
         self.leds_service.rotateEyes(0x00FF0000, rotation_speed, total_duration)
+    
+    def thinking_parloop(self, rotation_period=1):
+        # "parallel loop"
+        leds_thread = _ThinkingStoppable(self.leds_service, rotation_period)
+        leds_thread.start()
+        return leds_thread
 
     def leds_off(self):
         name=self.group_name

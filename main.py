@@ -9,6 +9,7 @@ import pepper_cmd
 from pepper_cmd import *
 
 from behavior_waitable import BehaviorWaitable
+from vow import Vow
 from tris import *
 from planner_tris import *
 from agent_tris import *
@@ -84,13 +85,14 @@ def pepper_turn(agent):
     thinking_time = random.uniform(1,3)
     think = BehaviorWaitable("tris-behaviours-25/francesco/thinking")
     # TODO 1~2 more, shorter thinking gestures
-    pepper_leds.thinking(total_duration=thinking_time)
+    think_leds = pepper_leds.thinking_parloop()
     pepper_cmd.robot.say(random.choice((
         "Thinking ...",
         "Let's see...",
         "What to do...?"
     )))
     think.wait()
+    think_leds.request_stop()
 
     pepper_move, pepper_did_optimal_move = agent.on_my_turn()
     game.move(*pepper_move)
@@ -142,6 +144,9 @@ def player_turn(agent, pepper_player, human_player):
     game_paused = False
     game_pause_countdown = 0
     #TODO led waiting
+    waiting_leds = pepper_leds.waiting_parloop()
+    print "REMINDER: What happens when the waiting leds are interrupted by the default leds? Use await_stop if necessary."
+
     while True:
         if proxemics.is_in_zone_for_delay(10,proxemics.AWAY_ZONE):
             #the user left, after 10 seconds the game is paused. Delay can be affected by the random delay below
@@ -155,6 +160,7 @@ def player_turn(agent, pepper_player, human_player):
             if game_pause_countdown == 1:
                 ws_handler.send("event pause-game-warning")
             if game_pause_countdown == 0:
+                waiting_leds.request_stop()
                 raise UserLeavingException("user_left_timeout")
             game_pause_countdown -= 1
             
@@ -167,18 +173,19 @@ def player_turn(agent, pepper_player, human_player):
                 game_paused = False
         else:
             timeout = 7 + 6*random.random()
-            pepper_leds.waiting(duration=timeout)
 
             response = pepper_cmd.robot.asr(vocabulary_player_move, timeout=timeout, enableWordSpotting=True)
             
             # don't do anything else if the move was done via click
             if the_bb.clicked_move:
+                waiting_leds.request_stop()
                 pepper_leds.default()
                 player_move = the_bb.clicked_move
                 the_bb.clicked_move = None
                 break
 
             if response:
+                waiting_leds.request_stop()
                 pepper_leds.default()
                 player_move = parse_move(response)
                 valid = game.move(*player_move)
@@ -197,6 +204,8 @@ def player_turn(agent, pepper_player, human_player):
 
                 if impatience_score >= len(impatience_responses):
                     impatience_score = 2    # loop the most impatient ones
+    # end while True
+    # i.e. human move selected correctly
         
     human_did_optimal_move = agent.on_opponent_move(player_move)
 
