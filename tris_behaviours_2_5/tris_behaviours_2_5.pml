@@ -26,6 +26,8 @@
         <BehaviorDescription name="behavior" src="francesco/shake_head_2" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/gesture_turn_3" xar="behavior.xar" />
         <BehaviorDescription name="behavior" src="francesco/clicked" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/thinking2" xar="behavior.xar" />
+        <BehaviorDescription name="behavior" src="francesco/thinking3" xar="behavior.xar" />
     </BehaviorDescriptions>
     <Dialogs />
     <Resources>

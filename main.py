@@ -82,9 +82,12 @@ def parse_move(response):
 
 
 def pepper_turn(agent):
-    thinking_time = random.uniform(1,3)
-    think = BehaviorWaitable("tris-behaviours-25/francesco/thinking")
-    # TODO 1~2 more, shorter thinking gestures
+    think_gestures = (
+        "tris-behaviours-25/francesco/thinking",
+        "tris-behaviours-25/francesco/thinking2",
+        "tris-behaviours-25/francesco/thinking3",
+    )
+    think = BehaviorWaitable(random.choice(think_gestures))
     think_leds = pepper_leds.thinking_parloop()
     pepper_cmd.robot.say(random.choice((
         "Thinking ...",
@@ -143,7 +146,6 @@ def player_turn(agent, pepper_player, human_player):
     player_move = None
     game_paused = False
     game_pause_countdown = 0
-    #TODO led waiting
     waiting_leds = pepper_leds.waiting_parloop()
     print "REMINDER: What happens when the waiting leds are interrupted by the default leds? Use await_stop if necessary."
 
@@ -404,7 +406,7 @@ def interact(debug = False):
         if pepper_score > human_score:
             pepper_cmd.robot.say("Okay. I won " + str(pepper_score) + " to " + str(human_score) + ". You'll do better next time!")
         elif human_score > pepper_score:
-            pepper_cmd.robot.say("Okay. You won " + str(pepper_score) + " to " + str(human_score) + ". You're quite good at this!")
+            pepper_cmd.robot.say("Okay. You won " + str(human_score) + " to " + str(pepper_score) + ". You're quite good at this!")
         else:  # draw
             pepper_cmd.robot.say("Okay. We ended up drawing at " + str(pepper_score) + " even. I had a lot of fun!")
         goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
