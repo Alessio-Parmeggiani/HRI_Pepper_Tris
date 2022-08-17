@@ -17,11 +17,7 @@
         - [X] "you cannot do this move" gesture (shake head gesture)
 
 
-- [ ] waiting on the other player (impatience gestures):
-    - [X] (D) "your turn" :invite user to make his move (gesture_turn_1)
-    - [ ] "come on" gesture
-    - [X] "i'm sleeping" gesture
-    - [ ] "uff..." gesture
+- [X] waiting on the other player (impatience gestures)
 
 - [X] thinking
 
@@ -30,17 +26,17 @@
 # Logic/Reasoning
 
 - [X] (D) basic proxemics w/ sonar A
-- [ ] profiling / difficulty select
-- [ ] Start --> Play --> new match/stop
+- [X] profiling / difficulty select
+- [X] Start --> Play --> new match/stop
 - [ ] Qualcosa di migliore per la scelta della mossa (qualche paper utile da trovare)
 
 
 # UI
 
 - [X] (F) game board
-- [ ] profiling / difficulty select (select on tablet for extra multimodality)
+- [X] profiling / difficulty select (select on tablet for extra multimodality)
 - [X] grid coordinates
-- [ ] select move by touching/clicking grid cell
+- [X] select move by touching/clicking grid cell
 - [ ] highlight tiles in a tris
 
 
@@ -61,14 +57,14 @@
 - [X] (D) suono vittoria 
 - [X] (D) suono sconfitta 
 - [ ] suono pensare 
-- [ ] (D) suono selezione su tablet 
+- [X] (D) suono selezione su tablet 
 
 
 # Speech
 Meglio da codice e non behaviour così interfacciamo con modim per lingua automatica
 
-- [ ] chiacchiere varie durante e tra le mosse
-- [ ] welcome / goodbye
+- [X] chiacchiere varie durante e tra le mosse
+- [X] welcome / goodbye
 - [ ] profiling / difficulty select
 
 
@@ -76,3 +72,10 @@ Meglio da codice e non behaviour così interfacciamo con modim per lingua automa
 
 - [ ] touch hand
 - [ ] touch head
+
+
+# Papers stuff
+
+- [ ] Cambia soglie delle zone prossemiche in base all'età? (scritto nel report, ma mi pare che non lo facciamo ancora)
+- [ ] Salvare utenti
+- [ ] Regole di interazione del robot teatrale
