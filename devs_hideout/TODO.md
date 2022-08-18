@@ -70,7 +70,7 @@ Meglio da codice e non behaviour così interfacciamo con modim per lingua automa
 
 # Other interactions
 
-- [ ] touch hand
+- [X] touch hand (handshake)
 - [ ] touch head
 
 

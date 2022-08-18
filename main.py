@@ -271,13 +271,13 @@ def play_game(difficulty_bias, pepper_player, human_player):
         #check victory
         if game.get_game_over_and_winner()[0]:
             break
+    #END MATCH
 
     
     # highlight the tris (if any) on the tablet
     hl_web_board = game.get_tris_highlights_for_tablet()
     ws_handler.send("highlight " + hl_web_board)
     
-    #END MATCH
     return game.get_game_over_and_winner()[1]
 
 ### end play_game()
@@ -415,9 +415,32 @@ def interact(debug = False):
             pepper_cmd.robot.say("Okay. You won " + str(human_score) + " to " + str(pepper_score) + ". You're quite good at this!")
         else:  # draw
             pepper_cmd.robot.say("Okay. We ended up drawing at " + str(pepper_score) + " even. I had a lot of fun!")
-        goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
-        pepper_cmd.robot.say('Come play again soon!')
-        goodbye.wait()
+        
+        # final handshake
+        handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
+        pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
+        handshake.wait()
+        # wait for hand touching (with timeout)
+        pepper_cmd.robot.startSensorMonitor()
+        hand_touched = False
+        TIMEOUT = 5    # in seconds
+        wait_start_timestamp = time.clock()     # processor time in seconds. dont care about absolute value, just difference.
+        while (not hand_touched) and (time.clock() - wait_start_timestamp < TIMEOUT):
+            p = pepper_cmd.robot.sensorvalue("righthandtouch")    # give no arg to get all sensors in a list, see pepper_cmd.py
+            hand_touched = p>0
+        pepper_cmd.robot.stopSensorMonitor()
+        # give time to the user to let go of the hand
+        time.sleep(1)
+        # return to normal posture
+        pepper_cmd.robot.normalPosture()
+
+        # bye bye
+        if hand_touched:
+            goodbye = BehaviorWaitable("tris-behaviours-25/francesco/goodbye2")
+            pepper_cmd.robot.say('Come play again soon!')
+            goodbye.wait()
+        else:    # no respect for a probably gone user, but also don't reset silently either.
+            pepper_cmd.robot.say('Aww... Resetting.')
 
 
     else:   # answered NO to "wanna play tris?"
