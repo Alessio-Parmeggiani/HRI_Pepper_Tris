@@ -10,6 +10,7 @@
 
     --x-color: red;
     --o-color: blue;
+    --highlight-color: #ffff0080;
 }
 
 /* The .page class does nothing here, it's useful to select all pages from the JS*/
@@ -43,9 +44,24 @@
 
 
 
+#loading {
+    text-align: center;
+}
+#loading img {
+    margin: 200px;
+}
+
+
+
+
+
+
+
+
 .container {
     margin: /*0*/ auto;
     display: grid;
+    column-gap: var(--board-line-width);    /* Make highlight not cover vert lines. Rows have some auto spacing for some arcane reason. */
     grid-template-columns:  10% 30% 30% 30%;
     grid-template-rows: 10% 30% 30% 30%;
     max-width: var(--board-dim);
@@ -89,4 +105,8 @@
 
 .has-o {
     color: var(--o-color);
+}
+
+.highlight {
+    background-color: var(--highlight-color);
 }

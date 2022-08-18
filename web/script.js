@@ -1,3 +1,8 @@
+/*
+For the highlight (and text colorization too): it seems classList is not supported on old browsers for 2011,
+so in the unlikely case it's not compatible with Pepper, check our TODO.md for an alternative
+*/
+
 console.log("Hello world")
 
 
@@ -84,13 +89,42 @@ function body_loaded() {
         document.getElementById("game").hidden = false;
       }
 
-      console.error("[WS message] Event unrecognized.");
+      else {
+        console.error("[WS message] Event unrecognized.");
+      }
 
       return;
 
     }
 
-    // if it's not an event, it's a board message
+    // or it may be a highlight message
+    else if (tokens[0] == "highlight") {
+      let hl = tokens[1];
+
+      if (hl.length != 9) {
+        console.error("[WS message] Highlight malformed, its length is not 9");
+        return;
+      }
+
+      for (let i=0; i<hl.length; i++) {
+        let c = hl[i];
+        if ("Hh. ".indexOf(c) == -1) {
+          console.error("[WS message] Highlight malformed, forbidden character");
+        }
+        c = c.replace("h", "H");
+        // manage class for highlight
+        if (c == "H") {
+          board_array[i].classList.add('highlight');
+        }
+        else {
+          board_array[i].classList.remove('highlight');
+        }
+      }
+
+      return;
+    }
+
+    // if no recognizable prefix, it's a board message
 
     if (msg.length != 9) {
       console.error("[WS message] Message malformed, its length is not 9");
@@ -117,7 +151,7 @@ function body_loaded() {
       // Cool Unicode characters. May not work with Pepper.     ×∘ ○⨯ ◯
       c = c.replace("X", "⨯");
       c = c.replace("O", "○");
-      board_array[i].innerText = c;     // temp visualization
+      board_array[i].innerText = c;
     }
   };
 

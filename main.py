@@ -251,6 +251,8 @@ def play_game(difficulty_bias, pepper_player, human_player):
     ws_handler.send("event loading-complete")
     web_board=game.get_board_for_tablet()
     ws_handler.send(web_board)
+    # reset highlighting
+    ws_handler.send("highlight .........")
     
     #START MATCH
     while not game.get_game_over_and_winner()[0]:
@@ -270,6 +272,10 @@ def play_game(difficulty_bias, pepper_player, human_player):
         if game.get_game_over_and_winner()[0]:
             break
 
+    
+    # highlight the tris (if any) on the tablet
+    hl_web_board = game.get_tris_highlights_for_tablet()
+    ws_handler.send("highlight " + hl_web_board)
     
     #END MATCH
     return game.get_game_over_and_winner()[1]

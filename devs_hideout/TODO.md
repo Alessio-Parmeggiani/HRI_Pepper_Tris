@@ -79,3 +79,9 @@ Meglio da codice e non behaviour così interfacciamo con modim per lingua automa
 - [ ] Cambia soglie delle zone prossemiche in base all'età? (scritto nel report, ma mi pare che non lo facciamo ancora)
 - [ ] Salvare utenti
 - [ ] Regole di interazione del robot teatrale
+
+# OFF-TOPIC: Old-compatible DOM classing
+
+It seems classList is not supported on old browsers from 2011.
+If Pepper turns out to use such an old browser, see this StackOverflow post:
+https://stackoverflow.com/questions/6787383/how-to-add-remove-a-class-in-javascript

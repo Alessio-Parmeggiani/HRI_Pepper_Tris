@@ -50,7 +50,11 @@ class Tris:
     #check if game is over
     def get_game_over_and_winner(self):
         return get_game_over_and_winner(self.board)    # w/o `self.` it refers to the global method outside
-    
+
+    # highlights tiles in a tris to show on the tablet
+    def get_tris_highlights_for_tablet(self):
+        return get_tris_highlights_for_tablet(self.board)    # w/o `self.` it refers to the global method outside
+
     #check if a player may win next move
     def player_is_threatening(self, player):
         return player_is_threatening(self.board, player)    # w/o `self.` it refers to the global method outside
@@ -100,6 +104,43 @@ def get_game_over_and_winner(board):
     #there is a draw
     return True, Tris.DRAW
 
+# highlight tris
+def get_tris_highlights_for_tablet(board):
+    hl_matrix = [
+        [False, False, False],
+        [False, False, False],
+        [False, False, False],
+    ]
+
+    # check rows
+    for row in range(3):
+        if board[row][0] != Tris.EMPTY and board[row][0] == board[row][1] == board[row][2]:
+            hl_matrix[row][0] = True
+            hl_matrix[row][1] = True
+            hl_matrix[row][2] = True
+    # check columns
+    for col in range(3):
+        if board[0][col] != Tris.EMPTY and board[0][col] == board[1][col] == board[2][col]:
+            hl_matrix[0][col] = True
+            hl_matrix[1][col] = True
+            hl_matrix[2][col] = True
+    # check diagonals
+    if board[0][0] != Tris.EMPTY and board[0][0] == board[1][1] == board[2][2]:
+        hl_matrix[0][0] = True
+        hl_matrix[1][1] = True
+        hl_matrix[2][2] = True
+    if board[0][2] != Tris.EMPTY and board[0][2] == board[1][1] == board[2][0]:
+        hl_matrix[0][2] = True
+        hl_matrix[1][1] = True
+        hl_matrix[2][0] = True
+
+    # generate tablet string
+    s = ''
+    for row in hl_matrix:
+        for cell in row:
+            s += ('H' if cell else '.')
+    return s
+
 # a player threatens a win if there is a row, col or diag where two spaces have its symbol and the third is empty.
 # first an aux
 def set_is_threatened(tile1, tile2, tile3, player):
@@ -120,7 +161,9 @@ def player_is_threatening(board, player):
     if set_is_threatened(board[0][0], board[1][1], board[2][2], player):
         return True
     if set_is_threatened(board[0][2], board[1][1], board[2][0], player):
-        return True, board[0][2]
+        return True
+    # no threats detected here
+    return False
 
 
 #test
