@@ -37,7 +37,7 @@
 - [X] profiling / difficulty select (select on tablet for extra multimodality)
 - [X] grid coordinates
 - [X] select move by touching/clicking grid cell
-- [ ] highlight tiles in a tris
+- [X] highlight tiles in a tris
 
 
 
