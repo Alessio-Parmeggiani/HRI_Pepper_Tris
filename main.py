@@ -15,18 +15,16 @@ from planner_tris import *
 from agent_tris import *
 from proxemics import *
 from leds import *
+from utils import UserLeavingException, vocabulary_yesno
+from user_utils import interact_for_user_info, get_user_difficulty
 
 import threading
 from webserver import go
 
-vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
 game = None    # Blackboard needs this global, and Pepper can only play one game at a time regardless
 
 pepper_leds=None
 
-# thrown if the user leaves during the interaction.
-class UserLeavingException(Exception):
-    pass
 
 
 # classes for the webserver
@@ -304,35 +302,20 @@ def interact(debug = False):
         #SET PARAMETERS FOR PLAY
         pepper_player = Tris.X
         human_player = Tris.O
-        the_bb.user_experience = None
-        the_bb.user_age = None
-
-        ws_handler.send("event interaction-begin")
-
-        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
-        pepper_cmd.robot.say("Please select a difficulty level on my tablet")
-        while not the_bb.user_age or not the_bb.user_experience: 
-            #if 10 seconds are passed without any proximity signal, nor any interaction, go back to the main screen
-            if proxemics.is_in_zone_for_delay(10, proxemics.AWAY_ZONE):
-                #TODO ? gesture or speak to go back
-                #       [francesco] I don't think so, for this specific point it may be better a quiet reset
-                print "user went away during profiling, going back to main screen"
-                ws_handler.send("event interaction-end")
-                return
-            pass
-
-
-        #PROFILING
-        user_age=the_bb.user_age
-        user_experience=the_bb.user_experience
-        #combine user age and user experience like in f1 score
-        base_difficulty = 1-(2*(user_age * user_experience)/(user_age + user_experience))
-        difficulty_bias = base_difficulty
-        print "initial difficulty is: ", difficulty_bias
+        
+        try:
+            user_record = interact_for_user_info(the_bb, ws_handler, proxemics)
+        except UserLeavingException as e:
+            ws_handler.send("event interaction-end")
+            return
 
         # init score
-        pepper_score = 0
-        human_score = 0
+        pepper_score = user_record.pepper_score
+        human_score = user_record.human_score
+
+        difficulty_bias = get_user_difficulty(user_record.base_difficulty, pepper_score, human_score)
+        print "difficulty is: ", difficulty_bias
+
 
         play_again = True
         
@@ -385,12 +368,7 @@ def interact(debug = False):
             print ("score", "pepper", pepper_score, "human", human_score)
             
             # adjust difficulty for next game
-            ratio = (pepper_score+2.0)/(human_score+2.0)    # gotta add at least +1 to avoid division by 0, add more to dampen the difficulty swing during the first games
-            if ratio <= 1:    # human is winning, Pepper plays harder
-                difficulty_bias = ratio * base_difficulty
-            if ratio > 1:    # Pepper is winning and plays easier
-                ratio = 1.0/ratio
-                difficulty_bias = base_difficulty + ratio * (1-base_difficulty)
+            difficulty_bias = get_user_difficulty(user_record.base_difficulty, pepper_score, human_score)
             print ("difficulty:", difficulty_bias)
             
             pepper_cmd.robot.say('Wanna play again?')

@@ -49,7 +49,7 @@ function body_loaded() {
         document.getElementById("idle-approached").hidden = false;
       }
 
-      else if (tokens[1] == "interaction-begin") {
+      else if (tokens[1] == "enter-profiling") {
         document.getElementById("idle-approached").hidden = true;
         document.getElementById("age-select").hidden = false;
       }
