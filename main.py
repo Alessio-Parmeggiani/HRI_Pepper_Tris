@@ -16,7 +16,7 @@ from agent_tris import *
 from proxemics import *
 from leds import *
 from utils import UserLeavingException, vocabulary_yesno
-from user_utils import interact_for_user_info, get_user_difficulty, save_user
+from user_utils import interact_for_user_info, save_user
 
 import threading
 from webserver import go
@@ -242,9 +242,10 @@ def play_game(difficulty_bias, pepper_player, human_player):
     ws_handler.send("event loading-start")
     print "initializing game...."
     pepper_cmd.robot.say("Please wait while I load the game...")
-    #TODO placeholder for loading (done now?)
+
     game = Tris()
     agent = Agent(game, pepper_player, difficulty_bias)
+
     # send initial board to tablet
     ws_handler.send("event loading-complete")
     web_board=game.get_board_for_tablet()
@@ -283,10 +284,8 @@ def play_game(difficulty_bias, pepper_player, human_player):
 
 # This includes all the interaction with a new user
 def interact(debug = False):
-    pepper_cmd.robot.say("Hello, I'm Pepper. I'm here to play Tris. Wanna play?")
+    pepper_cmd.robot.say("Hello, I'm Pepper. I'm here to play Tic-Tac-Toe. Wanna play?")
 
-    #pepper_cmd.robot.say('Hello')
-    #pepper_cmd.robot.say('Wanna play tris?')
     response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
     if debug:
@@ -294,14 +293,9 @@ def interact(debug = False):
         response = "yes!!!"
     
     if "yes" in response:
-        # TODO
         welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome")
-        pepper_cmd.robot.say('yeah')
+        pepper_cmd.robot.say("Yeah, let's play!")
         welcome.wait()
-        
-        #SET PARAMETERS FOR PLAY
-        pepper_player = Tris.X
-        human_player = Tris.O
         
         try:
             user_record = interact_for_user_info(the_bb, ws_handler, proxemics)
@@ -309,11 +303,12 @@ def interact(debug = False):
             ws_handler.send("event interaction-end")
             return
 
-        # read and write score to user_record.pepper_score and user_record.human_score
-        # same for user_record.base_difficulty
-
-        difficulty_bias = get_user_difficulty(user_record.base_difficulty, user_record.pepper_score, user_record.human_score)
+        #SET PARAMETERS FOR PLAY
+        pepper_player = Tris.X
+        human_player = Tris.O
+        difficulty_bias = user_record.get_difficulty()
         print "difficulty is: ", difficulty_bias
+        # read and write score to user_record.pepper_score and user_record.human_score
 
 
         play_again = True
@@ -367,7 +362,7 @@ def interact(debug = False):
             print ("score", "pepper", user_record.pepper_score, "human", user_record.human_score)
             
             # adjust difficulty for next game
-            difficulty_bias = get_user_difficulty(user_record.base_difficulty, user_record.pepper_score, user_record.human_score)
+            difficulty_bias = user_record.get_difficulty()
             print ("difficulty:", difficulty_bias)
             
             pepper_cmd.robot.say('Wanna play again?')

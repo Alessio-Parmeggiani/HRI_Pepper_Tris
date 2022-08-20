@@ -17,6 +17,15 @@ class Record:
         self.pepper_score = pepper_score
         self.human_score = human_score
     
+    def get_difficulty(self):
+        ratio = (self.pepper_score+2.0)/(self.human_score+2.0)    # gotta add at least +1 to avoid division by 0, add more to dampen the difficulty swing during the first games
+        if ratio <= 1:    # human is winning, Pepper plays harder
+            difficulty_bias = ratio * self.base_difficulty
+        if ratio > 1:    # Pepper is winning and plays easier
+            ratio = 1.0/ratio
+            difficulty_bias = self.base_difficulty + ratio * (1-self.base_difficulty)
+        return difficulty_bias
+    
     def __str__(self):
         return "ID " + str(self.user_id) + " : " + str(self.base_difficulty) + " " + str(self.pepper_score) + "-" + str(self.human_score)
 
@@ -70,18 +79,6 @@ def gen_user_id(i):
     int_id = i
     str_id = str(i)
     return str_id
-
-
-
-# TODO make this an instance method of the Record?
-def get_user_difficulty(base_difficulty, pepper_score, human_score):
-    ratio = (pepper_score+2.0)/(human_score+2.0)    # gotta add at least +1 to avoid division by 0, add more to dampen the difficulty swing during the first games
-    if ratio <= 1:    # human is winning, Pepper plays harder
-        difficulty_bias = ratio * base_difficulty
-    if ratio > 1:    # Pepper is winning and plays easier
-        ratio = 1.0/ratio
-        difficulty_bias = base_difficulty + ratio * (1-base_difficulty)
-    return difficulty_bias
 
 
 
