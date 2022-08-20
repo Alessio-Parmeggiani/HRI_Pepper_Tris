@@ -113,11 +113,51 @@ def handle_new_user(the_bb, ws_handler, the_proxemics):
 
     user_id = gen_user_id(len(users))
     user_record = Record(user_id, base_difficulty, 0, 0)
+    users[user_id] = user_record
 
     return user_record
 
 
-# The entry point of this module.
+def handle_returning_user(the_bb, ws_handler, the_proxemics):
+
+    pepper_cmd.robot.say("Welcome back then! Can you remind me your user number?")
+
+    vocabulary_existing_ids = [key for key in users.the_dict]
+
+    # try to get user's ID, while checking if they left every once in a while.
+    # spend a LONG time on this, since if the user fails to answer
+    # we'll assume they mis-responded earlier, or forgot, or w/e
+    # and send them to the new user's path instead.
+    for _ in range(3):
+        # listen
+        user_id = pepper_cmd.robot.asr(vocabulary_existing_ids, enableWordSpotting=True, timeout=10)
+        # if answered, ok
+        if user_id != "":
+            break
+        # check if left
+        if the_proxemics.is_in_zone_for_delay(10, the_proxemics.AWAY_ZONE):
+            print "user went away during ID checking, going back to main screen"
+            raise UserLeavingException("asking user ID")
+
+    if user_id == "":     # as I just said
+        pepper_cmd.robot.say("You don't know...? Then I'll create a new profile for you")
+        return handle_new_user(the_bb, ws_handler, the_proxemics)
+        # and stop
+    
+    user_record = users[user_id]
+    pepper_cmd.robot.say('Yeah, we were ' + str(user_record.pepper_score) + ' to ' + str(user_record.human_score))
+
+    if user_record.pepper_score > user_record.human_score:
+        pepper_cmd.robot.say("Here for a rematch? :)")
+    elif user_record.human_score > user_record.pepper_score:
+        pepper_cmd.robot.say("I'll beat you this time!")
+    else:
+        pepper_cmd.robot.say("Let's play again!")
+
+    return user_record
+
+
+# An entry point of this module.
 # Ask if this user is a new or returning player,
 # if new profile them and create a record,
 # if returning fetch the record.
@@ -129,22 +169,25 @@ def interact_for_user_info(the_bb, ws_handler, the_proxemics):
     if users == None:
         users = UsersClass()
 
-    # TODO proxemics throw exception
-
     pepper_cmd.robot.say("Is this the first time you play with me?")
     response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
 
-    print "FORCING YES AGAIN"
-    response = "yes!!!"
+    # if user didn't respond, there's the chance they left
+    if response == "" and the_proxemics.is_in_zone_for_delay(10, the_proxemics.AWAY_ZONE):
+        print "user went away when asked if new, going back to main screen"
+        raise UserLeavingException("asked if new")
 
-    if "yes" in response:
+    if "no" in response:
+        # RETURNING USER
+        user_record = handle_returning_user(the_bb, ws_handler, the_proxemics)
+    else:
         # NEW USER
         user_record = handle_new_user(the_bb, ws_handler, the_proxemics)
-    else:
-        # RETURNING USER
-        pepper_cmd.robot.say("Oh")
-        pepper_cmd.robot.say("Oh no")
-        pepper_cmd.robot.say("I'm not ready for that yet")
-        raise Exception("AAAAAA")
     
     return user_record
+
+# Another entry point.
+# Makes sure the updated record gets into the big dict, then saves everything.
+def save_user(user_record):
+    users[user_record.user_id] = user_record
+    users.save()

@@ -16,7 +16,7 @@ from agent_tris import *
 from proxemics import *
 from leds import *
 from utils import UserLeavingException, vocabulary_yesno
-from user_utils import interact_for_user_info, get_user_difficulty
+from user_utils import interact_for_user_info, get_user_difficulty, save_user
 
 import threading
 from webserver import go
@@ -309,11 +309,10 @@ def interact(debug = False):
             ws_handler.send("event interaction-end")
             return
 
-        # init score
-        pepper_score = user_record.pepper_score
-        human_score = user_record.human_score
+        # read and write score to user_record.pepper_score and user_record.human_score
+        # same for user_record.base_difficulty
 
-        difficulty_bias = get_user_difficulty(user_record.base_difficulty, pepper_score, human_score)
+        difficulty_bias = get_user_difficulty(user_record.base_difficulty, user_record.pepper_score, user_record.human_score)
         print "difficulty is: ", difficulty_bias
 
 
@@ -337,7 +336,7 @@ def interact(debug = False):
             human_won = winner == human_player
     
             if pepper_won:
-                pepper_score += 1
+                user_record.pepper_score += 1
                 pepper_player = Tris.O
                 human_player = Tris.X
 
@@ -347,7 +346,7 @@ def interact(debug = False):
                 win.wait()
 
             elif human_won:
-                human_score += 1
+                user_record.human_score += 1
                 pepper_player = Tris.X
                 human_player = Tris.O
     
@@ -365,10 +364,10 @@ def interact(debug = False):
                 pepper_leds.neutral()
                 draw.wait()
 
-            print ("score", "pepper", pepper_score, "human", human_score)
+            print ("score", "pepper", user_record.pepper_score, "human", user_record.human_score)
             
             # adjust difficulty for next game
-            difficulty_bias = get_user_difficulty(user_record.base_difficulty, pepper_score, human_score)
+            difficulty_bias = get_user_difficulty(user_record.base_difficulty, user_record.pepper_score, user_record.human_score)
             print ("difficulty:", difficulty_bias)
             
             pepper_cmd.robot.say('Wanna play again?')
@@ -387,13 +386,17 @@ def interact(debug = False):
         ### end while
 
         # get here when user wants to stop playing
-        if pepper_score > human_score:
-            pepper_cmd.robot.say("Okay. I won " + str(pepper_score) + " to " + str(human_score) + ". You'll do better next time!")
-        elif human_score > pepper_score:
-            pepper_cmd.robot.say("Okay. You won " + str(human_score) + " to " + str(pepper_score) + ". You're quite good at this!")
+        if user_record.pepper_score > user_record.human_score:
+            pepper_cmd.robot.say("Okay. I won " + str(user_record.pepper_score) + " to " + str(user_record.human_score) + ". You'll do better next time!")
+        elif user_record.human_score > user_record.pepper_score:
+            pepper_cmd.robot.say("Okay. You won " + str(user_record.human_score) + " to " + str(user_record.pepper_score) + ". You're quite good at this!")
         else:  # draw
-            pepper_cmd.robot.say("Okay. We ended up drawing at " + str(pepper_score) + " even. I had a lot of fun!")
+            pepper_cmd.robot.say("Okay. We ended up drawing at " + str(user_record.pepper_score) + " even. I had a lot of fun!")
         
+        # SAVE USER
+        pepper_cmd.robot.say("Your user number is... " + user_record.user_id + ". Remember it next time we play!")
+        save_user(user_record)
+
         # final handshake
         handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
         pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
