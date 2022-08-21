@@ -79,9 +79,12 @@ Meglio da codice e non behaviour così interfacciamo con modim per lingua automa
 - [ ] Cambia soglie delle zone prossemiche in base all'età? (scritto nel report, ma mi pare che non lo facciamo ancora)
 - [X] Salvare utenti
 - [ ] Regole di interazione del robot teatrale
-    - [ ] Utterance-first behavior (l'interazione è sempre a due) [R1]
-    - [ ] Se sollevi un braccio, aspetta a riabbassarlo *(dovrebbe già essere così)* [R5]
-    - [ ] Desincronizzare movimenti con ambo le braccia! [R6]
+    - [X] Utterance-first behavior **VERIFICARE IN REALE** [R1]
+        - (l'interazione è sempre a due)
+        - (pare già a posto, i behavior ci mettono un istante a partire)
+    - [X] Se sollevi un braccio, aspetta a riabbassarlo **VERIFICARE IN REALE** [R5]
+        - (pare già a posto, i behavior ci mettono un istante a terminare)
+    - [X] Desincronizzare movimenti con ambo le braccia! [R6]
     - [ ] Contrasta movimento di un braccio con l'altro [R7-8]
     - *R3-4 sono sull'eye contact, ma noi ancora non lo consideriamo minimamente*
 
