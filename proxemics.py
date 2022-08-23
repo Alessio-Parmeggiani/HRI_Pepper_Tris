@@ -8,6 +8,13 @@ sys.path.append(os.getenv('PEPPER_TOOLS_HOME')+'/cmd_server')
 import pepper_cmd
 from pepper_cmd import robot
 
+class ProxemicsClosenessConfiguration:
+    
+    def __init__(self, zones):
+        if len(zones) != 3:
+            raise Exception('Proxemics configuration must have 4 zones divided by 3 limits')
+        self.zones = sorted(zones)
+
 #to simulate sonar values:
 #python ~/src/pepper_tools/sonar/sonar_sim.py --value 1.6 --duration 20
 #value, in our case, above 2.0 is considered "AWAY", below is considered "NEAR"
@@ -40,6 +47,7 @@ class ProxemicsInfo(object):
         self.outliar_values = outliar_values
         self.last_true_distance_time = None
         self.forcing_value = None # useful for debugging
+        self.configuration= ProxemicsClosenessConfiguration([0.5, 1.2, 2.0]) 
 
     def __del__(self):
         self.stop_sensors()
@@ -76,11 +84,11 @@ class ProxemicsInfo(object):
             return the zone of proximity from a distance. 
             The zone is a number between 0 and 3, where 0 is the closest (< 0.5), and 3 is the furthest(>2).
         '''
-        if distance < 0.5:
+        if distance < self.configuration.zones[0]:
             return self.INTIMATE_ZONE
-        elif distance < 1.2:
+        elif distance < self.configuration.zones[1]:
             return  self.CASUAL_ZONE
-        elif distance < 2.0:
+        elif distance < self.configuration.zones[2]:
             return  self.SOCIO_CONSULTIVE_ZONE
         else:
             return self.AWAY_ZONE
