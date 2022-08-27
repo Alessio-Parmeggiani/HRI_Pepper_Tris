@@ -11,11 +11,12 @@ from behavior_waitable import BehaviorWaitable
 from utils import UserLeavingException, vocabulary_yesno
 
 class Record:
-    def __init__(self, user_id, base_difficulty, pepper_score, human_score):
+    def __init__(self, user_id, base_difficulty, pepper_score, human_score, user_age):
         self.user_id = user_id
         self.base_difficulty = base_difficulty
         self.pepper_score = pepper_score
         self.human_score = human_score
+        self.user_age = user_age
     
     def get_difficulty(self):
         ratio = (self.pepper_score+2.0)/(self.human_score+2.0)    # gotta add at least +1 to avoid division by 0, add more to dampen the difficulty swing during the first games
@@ -27,7 +28,7 @@ class Record:
         return difficulty_bias
     
     def __str__(self):
-        return "ID " + str(self.user_id) + " : " + str(self.base_difficulty) + " " + str(self.pepper_score) + "-" + str(self.human_score)
+        return "ID " + str(self.user_id) + " : " + str(self.base_difficulty) + " " + str(self.pepper_score) + "-" + str(self.human_score) + ", age: "+str(self.user_age)
 
 # for internal use
 # a class named ...Class is a bit weird, but I like the instance be called simply "users"
@@ -55,7 +56,7 @@ class UsersClass:
         with open(users_path, "w") as f:
             for key in self.the_dict:
                 record = self.the_dict[key]
-                f.write(key+" "+str(record.base_difficulty)+" "+str(record.pepper_score)+" "+str(record.human_score)+"\n")
+                f.write(key+" "+str(record.base_difficulty)+" "+str(record.pepper_score)+" "+str(record.human_score)+" "+str(record.user_age)+"\n")
 
     def load(self):
         self.the_dict = dict()
@@ -70,7 +71,11 @@ class UsersClass:
                 basediff = float(tokens[1])
                 pepperscore = int(tokens[2])
                 humanscore = int(tokens[3])
-                self.the_dict[key] = Record(key, basediff, pepperscore, humanscore)
+                if len(tokens) > 4:
+                    userage = float(tokens[4])
+                else:
+                    userage = 0.75 # the default if not found, this will corresponds to an age between 19 and 24 yo
+                self.the_dict[key] = Record(key, basediff, pepperscore, humanscore, userage)
 
 # global users object, created lazily. don't like them being created upon import.
 users = None
@@ -109,7 +114,7 @@ def handle_new_user(the_bb, ws_handler, the_proxemics):
     base_difficulty = 1-(2*(user_age * user_experience)/(user_age + user_experience))
 
     user_id = gen_user_id(len(users))
-    user_record = Record(user_id, base_difficulty, 0, 0)
+    user_record = Record(user_id, base_difficulty, 0, 0, user_age)
     users[user_id] = user_record
 
     return user_record

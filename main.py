@@ -303,6 +303,15 @@ def interact(debug = False):
             ws_handler.send("event interaction-end")
             return
 
+        if user_record.user_age < 0.75: #0.5 and 0.25
+            if debug:
+                print("[debug]: USING CHILD PROXEMICS CONFIG")
+            proxemics.configuration = child_proxemics_config
+        else:
+            if debug:
+                print("[debug]: USING ADULT PROXEMICS CONFIG")
+            proxemics.configuration = adult_proxemics_config
+
         #SET PARAMETERS FOR PLAY
         pepper_player = Tris.X
         human_player = Tris.O
@@ -436,6 +445,10 @@ begin()
 the_bb = Blackboard()
 
 proxemics = ProxemicsInfo()
+#proxemics configuration
+adult_proxemics_config = ProxemicsClosenessConfiguration([0.5, 1.2, 2.0]) 
+child_proxemics_config = ProxemicsClosenessConfiguration([1, 1.7, 2.5])
+
 the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
