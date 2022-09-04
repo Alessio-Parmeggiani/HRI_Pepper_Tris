@@ -116,7 +116,8 @@ def pepper_turn(agent):
 ### end pepper_turn()
 
 def player_turn(agent, pepper_player, human_player):
-    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+    if not proxemics.is_too_close():
+        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
     pepper_cmd.robot.say(random.choice(('Your move :)', 'Your turn', 'Go', "What will you do?")))
     #point_tablet.wait()     
     #human move
@@ -197,7 +198,8 @@ def player_turn(agent, pepper_player, human_player):
                     print "invalid move"
 
             else: # ASR timed out
-                gest = BehaviorWaitable(impatience_gestures[impatience_score])
+                if not proxemics.is_too_close():
+                    gest = BehaviorWaitable(impatience_gestures[impatience_score])
                 pepper_cmd.robot.say(impatience_responses[impatience_score])
                 
                 impatience_score += 1
@@ -401,10 +403,14 @@ def interact(debug = False):
         pepper_cmd.robot.say("Your user number is... " + user_record.user_id + ". Remember it next time we play!")
         save_user(user_record)
 
-        # final handshake
-        handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
-        pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
-        handshake.wait()
+        # final handshake if enough distance
+        if not proxemics.is_too_close():
+            handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
+            pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
+            handshake.wait()
+        else:
+            pepper_cmd.robot.say("We've had some good games. See you next time!")
+            
         # wait for hand touching (with timeout)
         pepper_cmd.robot.startSensorMonitor()
         hand_touched = False

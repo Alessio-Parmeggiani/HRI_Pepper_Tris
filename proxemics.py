@@ -14,6 +14,7 @@ class ProxemicsClosenessConfiguration:
         if len(zones) != 3:
             raise Exception('Proxemics configuration must have 4 zones divided by 3 limits')
         self.zones = sorted(zones)
+        self.closeness_limit = 0.2 # in meters
 
 #to simulate sonar values:
 #python ~/src/pepper_tools/sonar/sonar_sim.py --value 1.6 --duration 20
@@ -131,6 +132,10 @@ class ProxemicsInfo(object):
             return True
 
         return False # timer is not expired yet
+
+    def is_too_close(self):
+        '''returns a boolean value indicating if the robot is too close to the opponent'''
+        return self.last_front_value < self.configuration.closeness_limit
 
 
     def did_change_front_zone(self):
