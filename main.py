@@ -116,7 +116,8 @@ def pepper_turn(agent):
 ### end pepper_turn()
 
 def player_turn(agent, pepper_player, human_player):
-    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+    if not proxemics.is_too_close():
+        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
     pepper_cmd.robot.say(random.choice(('Your move :)', 'Your turn', 'Go', "What will you do?")))
     #point_tablet.wait()     
     #human move
@@ -197,7 +198,8 @@ def player_turn(agent, pepper_player, human_player):
                     print "invalid move"
 
             else: # ASR timed out
-                gest = BehaviorWaitable(impatience_gestures[impatience_score])
+                if not proxemics.is_too_close():
+                    gest = BehaviorWaitable(impatience_gestures[impatience_score])
                 pepper_cmd.robot.say(impatience_responses[impatience_score])
                 
                 impatience_score += 1
@@ -303,6 +305,15 @@ def interact(debug = False):
             ws_handler.send("event interaction-end")
             return
 
+        if user_record.user_age < 0.75: #0.5 and 0.25
+            if debug:
+                print("[debug]: USING CHILD PROXEMICS CONFIG")
+            proxemics.configuration = child_proxemics_config
+        else:
+            if debug:
+                print("[debug]: USING ADULT PROXEMICS CONFIG")
+            proxemics.configuration = adult_proxemics_config
+
         #SET PARAMETERS FOR PLAY
         pepper_player = Tris.X
         human_player = Tris.O
@@ -392,10 +403,14 @@ def interact(debug = False):
         pepper_cmd.robot.say("Your user number is... " + user_record.user_id + ". Remember it next time we play!")
         save_user(user_record)
 
-        # final handshake
-        handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
-        pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
-        handshake.wait()
+        # final handshake if enough distance
+        if not proxemics.is_too_close():
+            handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
+            pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
+            handshake.wait()
+        else:
+            pepper_cmd.robot.say("We've had some good games. See you next time!")
+            
         # wait for hand touching (with timeout)
         pepper_cmd.robot.startSensorMonitor()
         hand_touched = False
@@ -436,6 +451,10 @@ begin()
 the_bb = Blackboard()
 
 proxemics = ProxemicsInfo()
+#proxemics configuration
+adult_proxemics_config = ProxemicsClosenessConfiguration([0.5, 1.2, 2.0]) 
+child_proxemics_config = ProxemicsClosenessConfiguration([1, 1.7, 2.5])
+
 the_webserver_thread = WebServerThread(the_bb)
 the_webserver_thread.start()
 
