@@ -31,9 +31,9 @@
 }
 
 .menu-button {
-    margin: 50px;
+    margin: 25px;
     min-width: 500px;
-    height: 340px;
+    height: 285px;
     font-size: 100px;
 }
 
@@ -48,7 +48,7 @@
     text-align: center;
 }
 #loading img {
-    margin: 200px;
+    margin: 150px;
 }
 
 
