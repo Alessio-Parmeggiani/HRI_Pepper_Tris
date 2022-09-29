@@ -1,6 +1,8 @@
 #This file is in python 2.7
 #class for tris architecture
 
+from utils import DEBUG
+
 class Tris:
     EMPTY = 0
     X = 1
@@ -39,8 +41,8 @@ class Tris:
 
     #make move
     def move(self, row, col):
-        print row
-        print col
+        if DEBUG: print row
+        if DEBUG: print col
         if self.board[row][col] != Tris.EMPTY:
             return False
         self.board[row][col] = self.current_player

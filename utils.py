@@ -3,3 +3,5 @@ class UserLeavingException(Exception):
     pass
 
 vocabulary_yesno = ["yes", "no", "yes please", "no thank you"]
+
+DEBUG = False

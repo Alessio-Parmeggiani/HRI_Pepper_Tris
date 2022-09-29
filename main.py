@@ -15,7 +15,7 @@ from planner_tris import *
 from agent_tris import *
 from proxemics import *
 from leds import *
-from utils import UserLeavingException, vocabulary_yesno
+from utils import UserLeavingException, vocabulary_yesno, DEBUG
 from user_utils import interact_for_user_info, save_user
 
 import threading
@@ -24,6 +24,9 @@ from webserver import go
 game = None    # Blackboard needs this global, and Pepper can only play one game at a time regardless
 
 pepper_leds=None
+
+
+SIMULATION = False    # NOTE: set this depending on operation mode
 
 
 
@@ -44,7 +47,6 @@ class Blackboard():
                 web_board=game.get_board_for_tablet()
                 ws_handler.send(web_board)
                 BehaviorWaitable("tris-behaviours-25/francesco/clicked")
-                # TODO vogliamo anche dei LED?
                 pepper_cmd.robot.asr_cancel()    # stop asr so we don't have to wait for the timeout to expire like a pesce lesso
 
 
@@ -85,7 +87,7 @@ def pepper_turn(agent):
         "tris-behaviours-25/francesco/thinking2",
         "tris-behaviours-25/francesco/thinking3",
     )
-    think = BehaviorWaitable(random.choice(think_gestures))
+    think = BehaviorWaitable(random.choice(think_gestures), safety_proxemics=proxemics)
     think_leds = pepper_leds.thinking_parloop()
     pepper_cmd.robot.say(random.choice((
         "Thinking ...",
@@ -94,6 +96,9 @@ def pepper_turn(agent):
     )))
     think.wait()
     think_leds.request_stop()
+
+    if proxemics.is_too_close():
+        pepper_cmd.robot.normalPosture()    # avoid unintentional head drift when gestures are locked b/c proxemics
 
     pepper_move, pepper_did_optimal_move = agent.on_my_turn()
     game.move(*pepper_move)
@@ -116,8 +121,7 @@ def pepper_turn(agent):
 ### end pepper_turn()
 
 def player_turn(agent, pepper_player, human_player):
-    if not proxemics.is_too_close():
-        point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet")
+    point_tablet = BehaviorWaitable("tris-behaviours-25/Alessio/point_tablet", safety_proxemics=proxemics)
     pepper_cmd.robot.say(random.choice(('Your move :)', 'Your turn', 'Go', "What will you do?")))
     #point_tablet.wait()     
     #human move
@@ -146,7 +150,7 @@ def player_turn(agent, pepper_player, human_player):
     game_paused = False
     game_pause_countdown = 0
     waiting_leds = pepper_leds.waiting_parloop()
-    print "REMINDER: What happens when the waiting leds are interrupted by the default leds? Use await_stop if necessary."
+    if DEBUG: print "REMINDER: What happens when the waiting leds are interrupted by the default leds? Use await_stop if necessary."
 
     while True:
         if proxemics.is_in_zone_for_delay(10,proxemics.AWAY_ZONE):
@@ -157,7 +161,7 @@ def player_turn(agent, pepper_player, human_player):
                 game_paused = True
                 game_pause_countdown = 3 #countdown to go back to main screen
             
-            print "countdown: " + str(game_pause_countdown)
+            if DEBUG: print "countdown: " + str(game_pause_countdown)
             if game_pause_countdown == 1:
                 ws_handler.send("event pause-game-warning")
             if game_pause_countdown == 0:
@@ -198,8 +202,7 @@ def player_turn(agent, pepper_player, human_player):
                     print "invalid move"
 
             else: # ASR timed out
-                if not proxemics.is_too_close():
-                    gest = BehaviorWaitable(impatience_gestures[impatience_score])
+                gest = BehaviorWaitable(impatience_gestures[impatience_score], safety_proxemics=proxemics)
                 pepper_cmd.robot.say(impatience_responses[impatience_score])
                 
                 impatience_score += 1
@@ -267,7 +270,7 @@ def play_game(difficulty_bias, pepper_player, human_player):
         web_board=game.get_board_for_tablet()
         ws_handler.send(web_board)
             
-        print game
+        if DEBUG: print game
 
         #check victory
         if game.get_game_over_and_winner()[0]:
@@ -285,17 +288,17 @@ def play_game(difficulty_bias, pepper_player, human_player):
 
 
 # This includes all the interaction with a new user
-def interact(debug = False):
+def interact():
     pepper_cmd.robot.say("Hello, I'm Pepper. I'm here to play Tic-Tac-Toe. Wanna play?")
 
-    response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
+    response = pepper_cmd.robot.asr(vocabulary_yesno, timeout=(30 if SIMULATION else 10), enableWordSpotting=True)
 
-    if debug:
+    if DEBUG:
         print "[debug]: FORCING YES"
         response = "yes!!!"
     
     if "yes" in response:
-        welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome")
+        welcome = BehaviorWaitable("tris-behaviours-25/francesco/welcome", safety_proxemics=proxemics)
         pepper_cmd.robot.say("Yeah, let's play!")
         welcome.wait()
         
@@ -306,11 +309,11 @@ def interact(debug = False):
             return
 
         if user_record.user_age < 0.75: #0.5 and 0.25
-            if debug:
+            if DEBUG:
                 print("[debug]: USING CHILD PROXEMICS CONFIG")
             proxemics.configuration = child_proxemics_config
         else:
-            if debug:
+            if DEBUG:
                 print("[debug]: USING ADULT PROXEMICS CONFIG")
             proxemics.configuration = adult_proxemics_config
 
@@ -346,7 +349,7 @@ def interact(debug = False):
                 pepper_player = Tris.O
                 human_player = Tris.X
 
-                win = BehaviorWaitable("tris-behaviours-25/Alessio/victory")
+                win = BehaviorWaitable("tris-behaviours-25/Alessio/victory", safety_proxemics=proxemics)
                 pepper_cmd.robot.say('I win')
                 pepper_leds.winning()
                 win.wait()
@@ -356,7 +359,7 @@ def interact(debug = False):
                 pepper_player = Tris.X
                 human_player = Tris.O
     
-                lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat")
+                lose = BehaviorWaitable("tris-behaviours-25/Alessio/defeat", safety_proxemics=proxemics)
                 pepper_cmd.robot.say('Oh no')
                 pepper_leds.losing()
                 lose.wait()
@@ -365,10 +368,12 @@ def interact(debug = False):
                 # no score change
                 # no player change
 
-                draw = BehaviorWaitable("tris-behaviours-25/francesco/confused")
+                draw = BehaviorWaitable("tris-behaviours-25/francesco/confused", safety_proxemics=proxemics)
                 pepper_cmd.robot.say("Huh? It's a draw...")
                 pepper_leds.neutral()
                 draw.wait()
+
+            pepper_cmd.robot.normalPosture()
 
             print ("score", "pepper", user_record.pepper_score, "human", user_record.human_score)
             
@@ -377,7 +382,7 @@ def interact(debug = False):
             print ("difficulty:", difficulty_bias)
             
             pepper_cmd.robot.say('Wanna play again?')
-            response = pepper_cmd.robot.asr(vocabulary_yesno, enableWordSpotting=True)
+            response = pepper_cmd.robot.asr(vocabulary_yesno, timeout=(30 if SIMULATION else 10), enableWordSpotting=True)
 
             play_again = "yes" in response
 
@@ -408,22 +413,26 @@ def interact(debug = False):
             handshake = BehaviorWaitable("tris-behaviours-25/francesco/offer_handshake")
             pepper_cmd.robot.say("We've had some good games. Let's shake hands!")
             handshake.wait()
-        else:
+
+             # wait for hand touching (with timeout)
+            pepper_cmd.robot.startSensorMonitor()
+            hand_touched = False
+            TIMEOUT = 5    # in seconds
+            wait_start_timestamp = time.clock()     # processor time in seconds. dont care about absolute value, just difference.
+            while (not hand_touched) and (time.clock() - wait_start_timestamp < TIMEOUT):
+                p = pepper_cmd.robot.sensorvalue("righthandtouch")    # give no arg to get all sensors in a list, see pepper_cmd.py
+                hand_touched = p>0
+            pepper_cmd.robot.stopSensorMonitor()
+            # give time to the user to let go of the hand
+            time.sleep(1)
+
+        else:   # i.e., too close fo handshake
             pepper_cmd.robot.say("We've had some good games. See you next time!")
-            
-        # wait for hand touching (with timeout)
-        pepper_cmd.robot.startSensorMonitor()
-        hand_touched = False
-        TIMEOUT = 5    # in seconds
-        wait_start_timestamp = time.clock()     # processor time in seconds. dont care about absolute value, just difference.
-        while (not hand_touched) and (time.clock() - wait_start_timestamp < TIMEOUT):
-            p = pepper_cmd.robot.sensorvalue("righthandtouch")    # give no arg to get all sensors in a list, see pepper_cmd.py
-            hand_touched = p>0
-        pepper_cmd.robot.stopSensorMonitor()
-        # give time to the user to let go of the hand
-        time.sleep(1)
+            hand_touched = True
+
         # return to normal posture
         pepper_cmd.robot.normalPosture()
+
 
         # bye bye
         if hand_touched:
@@ -468,8 +477,9 @@ ws_handler = the_bb.the_handler
 pepper_leds=Leds()
 pepper_leds.default()
 
-#DEBUG: forcing sonar to measure always the robot in the CASUAL_ZONE
-proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE) # TODO remove
+#DEBUG (and simulation video): forcing sonar to measure always the robot in the CASUAL_ZONE
+if SIMULATION:
+    proxemics.begin_forcing_zone(proxemics.CASUAL_ZONE)
 
 while True:
 
@@ -478,7 +488,7 @@ while True:
     # when that happens...
     ws_handler.send("event user-approached")
 
-    interact(debug=True) #TODO remove debug flag
+    interact()
 
     time.sleep(2)
 

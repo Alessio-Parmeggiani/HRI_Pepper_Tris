@@ -1,6 +1,7 @@
 # use a game tree to play tris optimally (or not!)
 
 from tris import *
+from utils import DEBUG
 
 import random
 
@@ -28,9 +29,9 @@ class GameTree:
     
     # get child by move
     def get_child_by_move(self, move):
-        print ("seachin for ", move)
+        if DEBUG: print ("seachin for ", move)
         for child in self.children:
-            print child.move
+            if DEBUG: print child.move
             if child.move == move:
                 return child
         return None
@@ -53,8 +54,6 @@ class GameTree:
             else:
                 self.score = 0
             return
-
-        # TODO possible heruistics in the future
 
 
         #for each available move in the game, create a child tree
