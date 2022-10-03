@@ -33,10 +33,10 @@ class ProxemicsInfo(object):
     SOCIO_CONSULTIVE_ZONE = 2
     AWAY_ZONE = 3
 
-    def __init__(self, outliar_values = [0.0, None]):
+    def __init__(self, outlier_values = [0.0, None]):
         '''
             initialize the sensors.
-            outliar_values is a list of values that will be ignored (useful for DEBUG).
+            outlier_values is a list of values that will be ignored (useful for DEBUG).
         '''
         super(ProxemicsInfo, self).__init__()
         #start monitoring sensors
@@ -45,7 +45,7 @@ class ProxemicsInfo(object):
         self.last_front_value = 5
         self.last_back_value = 5
         #initialize outliar values
-        self.outliar_values = outliar_values
+        self.outlier_values = outlier_values
         self.last_true_distance_time = None
         self.forcing_value = None # useful for debugging
         self.configuration= ProxemicsClosenessConfiguration([0.5, 1.2, 2.0]) 
@@ -72,12 +72,12 @@ class ProxemicsInfo(object):
     def frontValue(self):
         '''get current useful value from front sensor'''
         val = pepper_cmd.robot.sonar[0] if self.forcing_value == None else self.forcing_value
-        return val if val not in self.outliar_values else self.last_front_value #filter out outliars measurements
+        return val if val not in self.outlier_values else self.last_front_value #filter out outliars measurements
 
     #def backValue(self):
     #    '''get current useful value from back sensor'''
     #    val = pepper_cmd.robot.sonar[1]
-    #    return val if val not in self.outliar_values else self.last_back_value #filter out outliars measurements
+    #    return val if val not in self.outlier_values else self.last_back_value #filter out outliars measurements
 
     ## GET DISTANCE IN TERMS OF AREA OF PROXIMITY
     def zoneFromDistance(self, distance):
