@@ -23,8 +23,8 @@ class Record:
         if ratio <= 1:    # human is winning, Pepper plays harder
             difficulty_bias = ratio * self.base_difficulty
         if ratio > 1:    # Pepper is winning and plays easier
-            ratio = 1.0/ratio
-            difficulty_bias = self.base_difficulty + ratio * (1-self.base_difficulty)
+            antiratio = 1.0/ratio
+            difficulty_bias = 1 + antiratio * (self.base_difficulty-1)
         return difficulty_bias
     
     def __str__(self):
