@@ -28,7 +28,7 @@ function body_loaded() {
     document.getElementById("t22")
   ];
 
-  let socket = new WebSocket("ws://localhost:8888/ws");
+  let socket = new WebSocket("ws://"+window.location.host+"/ws");
 
   socket.onopen = function(e) {
     console.log("[WS open] Connection established");

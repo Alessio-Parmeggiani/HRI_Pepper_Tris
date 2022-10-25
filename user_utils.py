@@ -9,6 +9,7 @@ import os, inspect
 import pepper_cmd
 from behavior_waitable import BehaviorWaitable
 from utils import UserLeavingException, vocabulary_yesno
+import re
 
 class Record:
     def __init__(self, user_id, base_difficulty, pepper_score, human_score, user_age):
@@ -146,7 +147,9 @@ def handle_returning_user(the_bb, ws_handler, the_proxemics):
         return handle_new_user(the_bb, ws_handler, the_proxemics)
         # and stop
     
-    user_record = users[user_id]
+    #to 
+    user_id_filtered = re.search(r'\d+',user_id).group()
+    user_record = users[user_id_filtered]
     pepper_cmd.robot.say('Yeah, we were ' + str(user_record.pepper_score) + ' to ' + str(user_record.human_score))
 
     if user_record.pepper_score > user_record.human_score:
